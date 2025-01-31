@@ -10,11 +10,11 @@ func main() {
 	var a, b int
 	fmt.Scan(&a, &b)
 	if a < b {
-		for i := 0; i <= b; i++ {
+		for i := a; i <= b; i++ {
 			fmt.Println(i, "cube:", i*i*i)
 		}
 	} else {
-		for i := a; i >= 1; i-- {
+		for i := a; i >= b; i-- {
 			fmt.Println(i, "cube:", i*i*i)
 		}
 	}

@@ -2,6 +2,14 @@ package main
 
 // возведение числа в степень
 
+import "fmt"
+
 func main() {
-	// нет идей как реализовывать, потому что не понимаю как применить функцию для абсолютного значения числа
+	var x, y int
+	fmt.Scan(&x, &y)
+	for y >= 1 {
+		result := x * y
+		fmt.Println(result)
+		break
+	}
 }

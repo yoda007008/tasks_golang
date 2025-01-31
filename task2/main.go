@@ -9,11 +9,13 @@ import (
 func main() {
 	var a, b int
 	fmt.Scan(&a, &b)
-	c := b + 1
-	for i := range c {
-		if i >= a {
-			fmt.Println(i, "cube =", i*i*i)
+	if a < b {
+		for i := 0; i <= b; i++ {
+			fmt.Println(i, "cube:", i*i*i)
+		}
+	} else {
+		for i := a; i > 0; i-- {
+			fmt.Println(i, "cube:", i*i*i)
 		}
 	}
-
 }

@@ -14,7 +14,7 @@ func main() {
 			fmt.Println(i, "cube:", i*i*i)
 		}
 	} else {
-		for i := a; i > 0; i-- {
+		for i := a; i >= 1; i-- {
 			fmt.Println(i, "cube:", i*i*i)
 		}
 	}

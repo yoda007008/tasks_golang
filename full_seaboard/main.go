@@ -31,7 +31,7 @@ func createField() Board {
 func printField(board Board) {
 	fmt.Println(" A B C D E F G H I J")
 	for i, row := range board {
-		fmt.Printf("%2d ", i+1)
+		fmt.Printf("%d ", i+1)
 		for _, cell := range row {
 			fmt.Printf("%s ", cell)
 		}

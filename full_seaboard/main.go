@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"math/rand"
+	"time"
 )
 
 const (
@@ -98,6 +99,26 @@ func makeShoot(board *Board, x, y int) string {
 	return "Ошибка, попробуй снова!"
 }
 
+// главная функция где и запускается программа
 func main() {
+	var x, y int
+	fmt.Println("Добро пожаловать в морской бой!")
+	fmt.Println("Введите координату x: ")
+	fmt.Scan(&x)
+	fmt.Println("Введите координату y: ")
+	fmt.Scan(&y)
 
+	rand.Seed(time.Now().UnixNano())
+	ships := []int{fourShip, thirdShip, thirdShip, secondShip, secondShip, secondShip, firstShip, firstShip, firstShip, firstShip}
+	board := createField()
+
+	for _, shipSize := range ships {
+		if !placeShip(&board, shipSize) {
+			fmt.Println("Плохое место для корабля", shipSize)
+		}
+	}
+
+	result := makeShoot(&board, x, y)
+	fmt.Println(result)
+	printField(board)
 }

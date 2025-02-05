@@ -79,6 +79,25 @@ func placeShip(board *Board, size int) bool {
 	return false
 }
 
+// функция благодаря которой мы производим выстрел на поле, при этом проверяя его статус
+func makeShoot(board *Board, x, y int) string {
+	if x < 0 || x >= boardSize || y < 0 || y >= boardSize {
+		return "Ошибка координат"
+	}
+	cell := &board[x][y]
+
+	if *cell == "." {
+		*cell = "M"
+		return "Промах!"
+	} else if *cell == "S" {
+		*cell = "X"
+		return "Попал!"
+	} else if *cell == "M" || *cell == "X" {
+		return "Ты уже сюда стрелял"
+	}
+	return "Ошибка, попробуй снова!"
+}
+
 func main() {
 
 }

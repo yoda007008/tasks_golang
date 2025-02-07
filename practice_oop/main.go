@@ -34,7 +34,7 @@ func (a *Account) Deposit(quantity float64) error {
 	if quantity < 0 {
 		return errNegativeDeposit
 	}
-	a.balance += quantity // зачисление средств
+	a.balance += quantity // зачисление средств на депозит
 	return nil
 }
 
@@ -52,6 +52,17 @@ func (a *Account) Withdraw(quantity float64) error {
 func main() {
 	a := &Account{owner: "owner"}
 	a.SetBalance(100)
-	fmt.Println(a.GetBalance())
+	fmt.Println("Вы пополнили баланс на", a.GetBalance(), "рублей")
 
+	dep := a.Deposit(10)
+	if dep != nil {
+		panic(errNegativeDeposit)
+	}
+
+	withdraw := a.Withdraw(100)
+	if withdraw != nil {
+		panic(errNegativeDeposit)
+	}
+
+	fmt.Println("У вас осталось", a.GetBalance(), "рублей")
 }

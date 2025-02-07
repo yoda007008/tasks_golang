@@ -43,4 +43,19 @@ func (st *Storage) UpdateProduct(productID int, quantity int) error {
 }
 
 func main() {
+	storage := &Storage{
+		Products: make(map[int]Product),
+	}
+	// добавление продукта
+	err := storage.AddProduct(Product{ID: 1, Name: "Ноутбук", Quantity: 3})
+
+	if err != nil {
+		fmt.Println("Ошибка при добавлении товара", err)
+		return
+	}
+	// изменение продукта
+	err = storage.UpdateProduct(1, -5)
+	if err != nil {
+		fmt.Println("Ошибка в изменении товара", err)
+	}
 }

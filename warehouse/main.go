@@ -58,4 +58,5 @@ func main() {
 	if err != nil {
 		fmt.Println("Ошибка в изменении товара", err)
 	}
+	fmt.Println(storage.Products[1])
 }

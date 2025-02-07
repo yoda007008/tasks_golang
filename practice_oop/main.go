@@ -43,5 +43,8 @@ func (a *Account) Withdraw(quantity float64) error {
 }
 
 func main() {
+	a := &Account{owner: "owner"}
+	a.SetBalance(100)
 
+	fmt.Println(a.GetBalance())
 }

@@ -54,13 +54,13 @@ func main() {
 	a.SetBalance(100)
 	fmt.Println("Вы пополнили баланс на", a.GetBalance(), "рублей")
 
-	dep := a.Deposit(10)
-	if dep != nil {
+	err := a.Deposit(10)
+	if err != nil {
 		panic(errNegativeDeposit)
 	}
 
-	withdraw := a.Withdraw(100)
-	if withdraw != nil {
+	err = a.Withdraw(100)
+	if err != nil {
 		panic(errNegativeDeposit)
 	}
 

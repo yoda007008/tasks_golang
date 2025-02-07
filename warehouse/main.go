@@ -29,5 +29,18 @@ func (st *Storage) AddProduct(product Product) error {
 	return nil
 }
 
+func (st *Storage) UpdateProduct(productID int, quantity int) error {
+	product, ok := st.Products[productID]
+	if !ok {
+		return fmt.Errorf("Товар с ID %d не найден на складе", productID)
+	}
+	if product.Quantity+quantity < 0 {
+		return fmt.Errorf("Количество товаров не может быть отрицательным")
+	}
+	product.Quantity += quantity
+	st.Products[productID] = product
+	return nil
+}
+
 func main() {
 }

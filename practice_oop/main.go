@@ -1,6 +1,13 @@
 package main
 
-import "fmt"
+import (
+	"errors"
+	"fmt"
+)
+
+// ошибки отрицательного депозита и баланса
+var errNegativeBalance = errors.New("Negative balance")
+var errNegativeDeposit = errors.New("Negative deposit")
 
 type Account struct {
 	owner   string
@@ -13,7 +20,7 @@ func NewAccount(owner string) *Account {
 
 func (a *Account) SetBalance(quantity float64) error {
 	if quantity < 0 {
-		fmt.Println("Отрицательный баланс")
+		return errNegativeBalance
 	}
 	a.balance = quantity
 	return nil
@@ -25,7 +32,7 @@ func (a *Account) GetBalance() float64 {
 
 func (a *Account) Deposit(quantity float64) error {
 	if quantity < 0 {
-		fmt.Println("Отрицательный или нулевой депозит")
+		return errNegativeDeposit
 	}
 	a.balance += quantity // зачисление средств
 	return nil
@@ -33,10 +40,10 @@ func (a *Account) Deposit(quantity float64) error {
 
 func (a *Account) Withdraw(quantity float64) error {
 	if quantity < 0 {
-		fmt.Println("Отрицательный депозит")
+		return errNegativeDeposit
 	}
 	if a.balance-quantity < 0 {
-		fmt.Println("Отрицательный депозит")
+		return errNegativeDeposit
 	}
 	a.balance -= quantity // снятие средств с депозита
 	return nil
@@ -45,6 +52,6 @@ func (a *Account) Withdraw(quantity float64) error {
 func main() {
 	a := &Account{owner: "owner"}
 	a.SetBalance(100)
-
 	fmt.Println(a.GetBalance())
+
 }

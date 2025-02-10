@@ -6,6 +6,7 @@ const MatrixSize = 3
 
 var Matrix [MatrixSize][MatrixSize]int
 
+// todo главная функция main()
 func main() {
 	fmt.Println("Заполните матрицу", MatrixSize, "x", MatrixSize, "числами построчно")
 
@@ -16,7 +17,7 @@ func main() {
 		}
 	}
 
-	// Вывод матрицы на экран + подсчет суммы
+	// todo Вывод матрицы на экран + подсчет суммы
 	fmt.Println("Введенная матрица:")
 	rowSum := [MatrixSize]int{}
 	colSum := [MatrixSize]int{}
@@ -36,7 +37,7 @@ func main() {
 		fmt.Printf("%d-я строка: %d\n", i+1, rowSum[i])
 	}
 
-	fmt.Println("\nСумма по столбцам!")
+	fmt.Println("Сумма по столбцам!")
 	for i := 0; i < MatrixSize; i++ {
 		fmt.Printf("%d-й столбец: %d\n", i+1, colSum[i])
 	}

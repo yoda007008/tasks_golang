@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"math/rand"
-	"time"
 )
 
 const (
@@ -12,6 +11,13 @@ const (
 	thirdShip  = 3
 	secondShip = 2
 	firstShip  = 1
+)
+
+type orientation int
+
+const (
+	gorizontal = 0
+	vertical   = 1
 )
 
 type Board [boardSize][boardSize]string
@@ -39,44 +45,34 @@ func printField(board Board) {
 	}
 }
 
+func isValid(x int, y int, size int, orientation orientation) bool {
+	return true
+}
+
 // генерация координат и проверка получится ли поставить корабль на поле
 func placeShip(board *Board, size int) bool {
-	orientation := rand.Intn(2)
-
-	for attempts := 0; attempts < 100; attempts++ {
-		x := rand.Intn(boardSize - (size-1)*(1-orientation))
-		y := rand.Intn(boardSize - (size-1)*orientation)
-
-		valid := true
-		if orientation == 0 {
-			for i := 0; i < size; i++ {
-				if board[y][x+i] != "." {
-					valid = false
-					break
-				}
-			}
-		} else {
-			for i := 0; i < size; i++ {
-				if board[y+i][x] != "." {
-					valid = false
-					break
-				}
+	o := orientation(rand.Intn(2))
+	shipPlaced := false
+	for !shipPlaced {
+		x := rand.Intn(boardSize)
+		y := rand.Intn(boardSize)
+		if !isValid(x, y, size, o) {
+			continue
+		}
+		// todo x, y проверить все точки корабля, попадают они или нет (функция isValid)
+		// конец игры нужно реализовать через проход по двумерному массиву
+		for i := 0; i < size; i++ {
+			board[y][x] = "S"
+			switch o {
+			case gorizontal:
+				x++
+			case vertical:
+				y++
 			}
 		}
-
-		if valid {
-			if orientation == 0 {
-				for i := 0; i < size; i++ {
-					board[y][x+i] = "S"
-				}
-			} else {
-				for i := 0; i < size; i++ {
-					board[y+i][x] = "S"
-				}
-			}
-			return true
-		}
+		shipPlaced = true
 	}
+
 	return false
 }
 
@@ -101,24 +97,24 @@ func makeShoot(board *Board, x, y int) string {
 
 // главная функция где и запускается программа
 func main() {
-	var x, y int
-	fmt.Println("Добро пожаловать в морской бой!")
-	fmt.Println("Введите координату x: ")
-	fmt.Scan(&x)
-	fmt.Println("Введите координату y: ")
-	fmt.Scan(&y)
-
-	rand.Seed(time.Now().UnixNano())
-	ships := []int{fourShip, thirdShip, thirdShip, secondShip, secondShip, secondShip, firstShip, firstShip, firstShip, firstShip}
+	//var x, y int
+	//fmt.Println("Добро пожаловать в морской бой!")
+	//fmt.Println("Введите координату x: ")
+	//fmt.Scan(&x)
+	//fmt.Println("Введите координату y: ")
+	//fmt.Scan(&y)
+	//
+	//rand.Seed(time.Now().UnixNano())
+	//ships := []int{fourShip, thirdShip, thirdShip, secondShip, secondShip, secondShip, firstShip, firstShip, firstShip, firstShip}
+	//board := createField()
+	//
+	//for _, shipSize := range ships {
+	//	placeShip(&board, shipSize)
+	//}
+	//
+	//result := makeShoot(&board, x, y)
+	//fmt.Println(result)
+	//printField(board)
 	board := createField()
-
-	for _, shipSize := range ships {
-		if !placeShip(&board, shipSize) {
-			fmt.Println("Плохое место для корабля", shipSize)
-		}
-	}
-
-	result := makeShoot(&board, x, y)
-	fmt.Println(result)
-	printField(board)
+	placeShip(&board, 2)
 }

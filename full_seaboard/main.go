@@ -45,7 +45,7 @@ func printField(board Board) {
 	}
 }
 
-func isValid(x int, y int, size int, orientation orientation) bool {
+func isValid(x int, y int, size int, orientation orientation, board Board) bool {
 	return true
 }
 

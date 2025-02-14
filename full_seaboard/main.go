@@ -46,17 +46,35 @@ func printField(board Board) {
 }
 
 func isValid(x int, y int, size int, orientation orientation, board Board) bool {
+	for k := 0; k < size; k++ {
+		switch orientation {
+		case gorizontal:
+			x++
+		case vertical:
+			y++
+		}
+		for row := x - 1; row < 3; row++ {
+			for col := y - 1; col < 3; col++ {
+				if x <= 0 || x >= boardSize || y <= 0 || y >= boardSize {
+					continue
+				}
+				if board[row][col] != "." {
+					return false
+				}
+			}
+		}
+	}
 	return true
 }
 
 // генерация координат и проверка получится ли поставить корабль на поле
-func placeShip(board *Board, size int) bool {
+func placeShip(board Board, size int) bool {
 	o := orientation(rand.Intn(2))
 	shipPlaced := false
 	for !shipPlaced {
 		x := rand.Intn(boardSize)
 		y := rand.Intn(boardSize)
-		if !isValid(x, y, size, o) {
+		if !isValid(x, y, size, o, board) {
 			continue
 		}
 		// todo x, y проверить все точки корабля, попадают они или нет (функция isValid)
@@ -116,5 +134,5 @@ func main() {
 	//fmt.Println(result)
 	//printField(board)
 	board := createField()
-	placeShip(&board, 2)
+	placeShip(board, 2)
 }

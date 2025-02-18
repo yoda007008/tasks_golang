@@ -58,6 +58,9 @@ func isValid(x int, y int, size int, orientation orientation, board Board) bool 
 		case vertical:
 			y += k
 		}
+		if size < 0 || size > 4 {
+			break
+		}
 		if x > boardSize-1 || y > boardSize-1 {
 			return false
 		}
@@ -88,7 +91,10 @@ func PlaceShip(board *Board, size int) bool {
 		}
 		// todo x, y проверить все точки корабля, попадают они или нет (функция isValid)
 		// конец игры нужно реализовать через проход по двумерному массиву
-		for i := 0; i < size; i++ {
+		for i := 0; i <= size; i++ {
+			if size < 0 || size > 4 {
+				break
+			}
 			board[y][x] = "S"
 			switch o {
 			case gorizontal:

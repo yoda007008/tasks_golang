@@ -70,7 +70,6 @@ func TestIsValid(t *testing.T) {
 }
 
 func TestPlaceShip(t *testing.T) {
-
 	cases := []struct {
 		name     string
 		size     int
@@ -114,8 +113,9 @@ func TestPlaceShip(t *testing.T) {
 			}
 			placeRes := PlaceShip(&board, tc.size)
 			if placeRes != tc.expected {
-				t.Errorf("Await %v, but was %v in test '%s'", tc.expected, placeRes, tc.name)
+				t.Errorf("Await %v, but was %v in test %s", tc.expected, placeRes, tc.name)
 			}
+
 		})
 	}
 }

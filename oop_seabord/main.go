@@ -90,27 +90,34 @@ func (f *Field) IsValid(x int, y int, size int, orientation orientation) bool {
 func (f *Field) PlaceShip(ship *Ship) bool {
 	o := orientation(rand.Intn(2))
 	ship.isDead = false
+
 	for !ship.isDead {
-		x := rand.Intn(boardSize)
-		y := rand.Intn(boardSize)
+		x := rand.Intn(boardSize - ship.size + 1)
+		y := rand.Intn(boardSize - ship.size + 1)
+
 		if f.IsValid(x, y, ship.size, o) {
 			continue
 		}
-		for i := 0; i < boardSize; i++ {
-			if ship.size < 0 || ship.size > 4 {
-				break
-			}
-			f.Board[x][y] = "S"
+
+		for i := 0; i < ship.size; i++ {
+			curX := x
+			curY := y
 			switch o {
 			case gorizontal:
-				x++
+				curX = x + i
 			case vertical:
-				y++
+				curY = y + i
 			}
+
+			if curX < 0 || curX >= boardSize || curY < 0 || curY >= boardSize {
+				break
+			}
+			f.Board[curY][curX] = "S"
 		}
 		ship.isDead = true
+		return true
 	}
-	return ship.isDead
+	return false
 }
 
 func (f *Field) MakeShoot(cord Cord) error {

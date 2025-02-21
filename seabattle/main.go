@@ -1,33 +1,57 @@
 package main
 
-const boardSize = 10
+import (
+	"math/rand"
+	"time"
+)
 
-type Board [boardSize][boardSize]string
-type FirstPlayer struct {
-	Board  Board
-	Result bool
-}
-type SecondPlayer struct {
-	Board  Board
-	Result bool
-}
-type ShipStatus struct {
-	Wounded bool
-	IsDead  bool
-}
-type FieldStatus struct {
-	// тут filled - статус заполненного поля
-	empty Board // пустое поле
+const (
+	boardSize  = 10
+	fourShip   = 4
+	thirdShip  = 3
+	secondShip = 2
+	firstShip  = 1
+)
+
+type Game interface {
+	Start()
+	IsEnded() bool
 }
 
-func (p *FirstPlayer) MakeShoot(status ShipStatus) {
-
+type Player interface {
+	DoMove() (int, int, error)
+	GiveUp()
 }
 
-func (p *SecondPlayer) MakeShootSecond(status ShipStatus) {
-
+type Board interface {
+	PlaceShips() error
+	TakeShoot() (string, error)
+	Size() int
 }
 
-func main() {
+type Ship interface {
+	GetStatus()
+	TakeShoot()
+}
+
+type Field struct {
+	Board [boardSize][boardSize]string
+}
+
+type GameRun struct {
+	players []Player
+	board   Board
+	ships   []Ship
+	isEnded bool
+}
+
+func (g *GameRun) Start() {
+	rand.Seed(time.Now().UnixNano())
+
+	shipSizes := []int{fourShip, thirdShip, thirdShip, secondShip, secondShip, secondShip, firstShip, firstShip, firstShip, firstShip}
+
+	for _, p := range g.players {
+		Player.DoMove(p)
+	}
 
 }

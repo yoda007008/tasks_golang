@@ -1,10 +1,5 @@
 package main
 
-import (
-	"math/rand"
-	"time"
-)
-
 const (
 	boardSize  = 10
 	fourShip   = 4
@@ -38,6 +33,11 @@ type Field struct {
 	Board [boardSize][boardSize]string
 }
 
+type Cord struct {
+	x int
+	y int
+}
+
 type GameRun struct {
 	players []Player
 	board   Board
@@ -45,13 +45,12 @@ type GameRun struct {
 	isEnded bool
 }
 
-func (g *GameRun) Start() {
-	rand.Seed(time.Now().UnixNano())
+type CreateShip struct {
+	size   int
+	isDead bool
+	cord   []Cord
+}
 
-	shipSizes := []int{fourShip, thirdShip, thirdShip, secondShip, secondShip, secondShip, firstShip, firstShip, firstShip, firstShip}
-
-	for _, p := range g.players {
-		Player.DoMove(p)
-	}
-
+type HumanPlayer struct {
+	board *Field
 }

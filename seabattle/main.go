@@ -1,5 +1,7 @@
 package main
 
+import "fmt"
+
 const (
 	boardSize  = 10
 	fourShip   = 4
@@ -53,4 +55,33 @@ type CreateShip struct {
 
 type HumanPlayer struct {
 	board *Field
+}
+
+func NewField() *Field { // заполнять и создавать поля нужно также, как и в предыдущей программе морского боя
+	f := &Field{}
+	for i := 0; i < boardSize; i++ {
+		for j := 0; j < boardSize; j++ {
+			f.Board[i][j] = "."
+		}
+	}
+	return f
+}
+
+func (f *Field) Print() { // вывод поля
+	fmt.Println("  0 1 2 3 4 5 6 7 8 9 10")
+	for i, row := range f.Board {
+		fmt.Printf("%d", i+1)
+		for _, cell := range row {
+			fmt.Printf("%s ", cell)
+		}
+		fmt.Println()
+	}
+}
+
+func (f *Field) PlaceShip() { // функция располагает для двух игроков корабли на поле рандомно
+
+}
+
+func (f *Field) DoMove() { // функция DoMove делает ходы
+
 }

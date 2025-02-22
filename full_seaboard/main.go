@@ -69,7 +69,7 @@ func isValid(x int, y int, size int, orientation orientation, board Board) bool 
 				if row <= 0 || row > boardSize-1 || col <= 0 || col > boardSize-1 {
 					continue
 				}
-				if board[row][col] != "." {
+				if board[row][col] != "." { // todo вместо точки проверять на nil *Ship
 					return false
 				}
 			}
@@ -95,7 +95,7 @@ func PlaceShip(board *Board, size int) bool {
 			if size < 0 || size > 4 {
 				break
 			}
-			board[y][x] = "S"
+			board[y][x] = "S" // todo размещать ссылку на корабль в ячейке поля [nil, nil, nil, nil, 0x01 &Ship{data = [Alive, Alive, Alive], size = 3, orientation = Horizontal}, 0x01, 0x01, nil, nil, nil]
 			switch o {
 			case gorizontal:
 				x++

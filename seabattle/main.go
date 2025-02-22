@@ -3,33 +3,11 @@ package main
 import "fmt"
 
 const (
-	boardSize  = 10
 	fourShip   = 4
 	thirdShip  = 3
 	secondShip = 2
 	firstShip  = 1
 )
-
-type Game interface {
-	Start()
-	IsEnded() bool
-}
-
-type Player interface {
-	DoMove() (int, int, error)
-	GiveUp()
-}
-
-type Board interface {
-	PlaceShips() error
-	TakeShoot() (string, error)
-	Size() int
-}
-
-type Ship interface {
-	GetStatus()
-	TakeShoot()
-}
 
 type Field struct {
 	Board [boardSize][boardSize]string
@@ -38,13 +16,6 @@ type Field struct {
 type Cord struct {
 	x int
 	y int
-}
-
-type GameRun struct {
-	players []Player
-	board   Board
-	ships   []Ship
-	isEnded bool
 }
 
 type CreateShip struct {
@@ -84,4 +55,13 @@ func (f *Field) PlaceShip() { // функция располагает для д
 
 func (f *Field) DoMove() { // функция DoMove делает ходы
 
+}
+
+func main() {
+	playersCount := 2
+	game := NewGame(playersCount)
+
+	for !game.IsEnded() {
+		game.Round()
+	}
 }

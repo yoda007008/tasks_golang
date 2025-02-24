@@ -29,29 +29,18 @@ type StandardShipImpl struct {
 }
 
 func (s StandardShipImpl) GetStatus() ShipStatus {
-	//TODO implement me
-	panic("implement me")
+	for _, stat := range s.decks {
+		switch stat {
+		case AliveDeck:
+			return Alive
+		case DeadDeck:
+			return Dead
+		}
+	}
+	return Hurt // в противном случае hurt
 }
 
 func (s StandardShipImpl) HandleShoot() {
 	//TODO implement me
 	panic("implement me")
-}
-
-// пример другой реализации корабля
-type ArmoredShipImpl struct {
-}
-
-func (s ArmoredShipImpl) GetStatus() ShipStatus {
-	//TODO implement me
-	panic("implement me")
-}
-
-func (s ArmoredShipImpl) HandleShoot() {
-	//TODO implement me
-	panic("implement me")
-}
-
-func NewArmoredShip() Ship {
-	return &ArmoredShipImpl{}
 }

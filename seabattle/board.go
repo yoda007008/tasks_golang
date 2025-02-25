@@ -11,7 +11,7 @@ const (
 )
 
 type Board interface {
-	PlaceShips() error
+	PlaceShip(int) error
 	HandleShoot(int, int) (string, error)
 	Size() int
 }
@@ -23,16 +23,14 @@ const (
 	vertical   = 1
 )
 
-type ShipStruct struct {
-	Size int
-}
-
 type BoardImpl struct {
 	Board2d [boardSize][boardSize]Ship
-	Ships   []Ship // для быстрого доступа
+	Ships   []Ship
 }
 
-func (b BoardImpl) PlaceShips(size int) error {
+// todo создать метод, который реализовывает вывод игрового поля, пример: x := BoardImpl{...}, fmt.Println(x.String())
+
+func (b BoardImpl) PlaceShip(size int) error {
 	if size < 0 || size > 4 {
 		return fmt.Errorf("%w", "Invalid ship size")
 	}
@@ -68,7 +66,17 @@ func (b BoardImpl) PlaceShips(size int) error {
 		}
 
 		// размещение корабля на поле
-		ship := &ShipStruct{Size: size}
+		ship := StandardShipImpl{
+			decks:       make([]DeckStatus, 0, size),
+			x:           x,
+			y:           y,
+			orientation: int(o),
+			size:        size,
+		}
+		for j := 0; j < size; j++ {
+			ship.decks = append(ship.decks, AliveDeck)
+		}
+
 		for i := 0; i < size; i++ {
 			if o == gorizontal {
 				b.Board2d[x+i][y] = ship

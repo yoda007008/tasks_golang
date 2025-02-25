@@ -24,6 +24,13 @@ type CreateShip struct {
 	cord   []Cord
 }
 
+type Human struct {
+	Name string
+	Age  int
+}
+
+var person = Human{Age: 18, Name: "Kirill"}
+
 type HumanPlayer struct {
 	board *Field
 }
@@ -58,10 +65,22 @@ func (f *Field) DoMove() { // функция DoMove делает ходы
 }
 
 func main() {
-	playersCount := 2
-	game := NewGame(playersCount)
+	//playersCount := 2
+	//game := NewGame(playersCount)
+	//
+	//for !game.IsEnded() {
+	//	game.Round()
+	//}
+	//var twoD [boardSize][boardSize]Ship
+	//board := BoardImpl{Board2d: twoD, Ships: make([]Ship, 0)}
+	//fmt.Println(board.String())
 
-	for !game.IsEnded() {
-		game.Round()
-	}
+	s := make([]string, 3)
+
+	s[0] = "a"
+	s[1] = "b"
+	s[2] = "c"
+	fmt.Println("set:", s)
+	fmt.Println("get:", s[2])
+	fmt.Println("len:", len(s))
 }

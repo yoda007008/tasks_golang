@@ -26,7 +26,7 @@ func NewGame(playersCount int) Game {
 		board := NewBoard()
 		players = append(players, &PlayerImpl{
 			id:    i,
-			board: nil,
+			board: board,
 		})
 	}
 

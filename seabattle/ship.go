@@ -29,15 +29,18 @@ type StandardShipImpl struct {
 }
 
 func (s StandardShipImpl) GetStatus() ShipStatus {
-	for _, stat := range s.decks {
-		switch stat {
-		case AliveDeck:
-			return Alive
-		case DeadDeck:
-			return Dead
+	deadCount := 0
+	for _, status := range s.decks {
+		if status == DeadDeck {
+			deadCount++
 		}
 	}
-	return Hurt // в противном случае hurt
+	if deadCount == s.size {
+		return Dead
+	} else if deadCount == 0 {
+		return Alive
+	}
+	return Hurt
 }
 
 func (s StandardShipImpl) HandleShoot() {

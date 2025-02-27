@@ -9,7 +9,7 @@ func main() {
 }
 
 func ReverseSlice(input []int) []int {
-	var newArray []int // reverse массива
+	newArray := make([]int, 0, 5) // reverse массива
 	for i := len(input) - 1; i >= 0; i-- {
 		newArray = append(newArray, input[i])
 	}

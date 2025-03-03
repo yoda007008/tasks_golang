@@ -6,91 +6,94 @@ import (
 	"time"
 )
 
-const (
-	hit    = true
-	missed = false
-)
-
-type FirstRobot struct {
-	name   string
-	stock  int
-	hp     int
-	damage int
+type Robot struct {
+	name      string
+	stock     int
+	hp        int
+	damage    int
+	isCooking bool
 }
 
-type SecondRobot struct {
-	name   string
-	stock  int
-	hp     int
-	damage int
-}
-
-type Game struct {
-	f FirstRobot
-	s SecondRobot
-}
-
-func (g *Game) BeginGame() { // начало игры
-	fmt.Println("Добро пожаловать в битву роботов (один выстрел 0,1 литра борща)")
-	fmt.Println("Введи имя первого робота ")
-	fmt.Scan(&g.f.name)
-	fmt.Println("Введи имя второго робота ")
-	fmt.Scan(&g.s.name)
-	fmt.Println("Введи литры для первого робота ")
-	fmt.Scan(&g.f.stock)
-	fmt.Println("Введи литры для второго робота ")
-	fmt.Scan(&g.s.stock)
-	fmt.Println("Введи hp для первого робота (hp не больше 100) ")
-	fmt.Scan(&g.f.hp)
-	fmt.Println("Введи hp для второго робота (hp не больше 100) ")
-	fmt.Scan(&g.s.hp)
-
-	if g.f.hp > 100 || g.s.hp > 100 || g.f.hp < 0 || g.s.hp < 0 {
-		fmt.Println("Хп не может быть меньше 0 или меньше 100")
+func NewRobot(name string, stock, hp, damage int) *Robot {
+	return &Robot{
+		name:   name,
+		stock:  stock,
+		hp:     hp,
+		damage: damage,
 	}
 }
 
-func (g *Game) canShoot() bool {
+func (r *Robot) ThrowsPlate(target *Robot) { // добавил новый метод
+	if r.isCooking {
+		fmt.Printf("%s пропускает ход, чтобы сварить новый борщ!\n", r.name)
+		r.isCooking = false
+		return
+	}
+
+	if r.stock <= 0 {
+		fmt.Printf("%s пытается сварить новый борщ\n", r.name)
+		r.TryCook()
+		return
+	}
+
+	if rand.Intn(2) == 0 {
+		fmt.Printf("%s уклонился от тарелки с борщом\n", target.name)
+		return
+	}
+
+	r.stock -= 1
+	target.hp -= r.damage
+	fmt.Printf("%s кинул тарелку борща в %s и нанес %d урона!\n", r.name, target.name, r.damage)
+}
+
+func (r *Robot) TryCook() {
+	if rand.Intn(10) < 2 {
+		fmt.Printf("%s взорвал кастрюлю и потерял 10 hp!\n", r.name)
+		r.hp -= 10
+	} else {
+		r.stock += 5
+		fmt.Printf("%s успешно сварил 5 литров борща!\n", r.name)
+	}
+}
+
+func (r *Robot) IsAlive() bool {
+	return r.hp > 0
+}
+
+func BattleRobots(robot1, robot2 *Robot) {
 	rand.Seed(time.Now().UnixNano())
-	shoot := rand.Intn(2)
-	return shoot == 1 // если выстрел успешен, возвращаем true
-}
 
-func (g *Game) DamagedRobots() { // основная логика игры
-	if g.canShoot() {
-		fmt.Printf("%s кидает %s!\n", g.f.name, g.s.name)
-		g.s.hp -= 10
-		fmt.Printf("%s получил урон! Осталось hp: %d\n", g.s.name, g.s.hp)
-	} else {
-		fmt.Printf("%s промахнулся!\n", g.f.name)
-	}
+	turn := 0
 
-	if g.canShoot() {
-		fmt.Printf("%s кидает %s!\n", g.s.name, g.f.name)
-		g.f.hp -= 10
-		fmt.Printf("%s получил урон! Осталось hp: %d\n", g.f.name, g.f.hp)
-	} else {
-		fmt.Printf("%s промахнулся!\n", g.s.name)
-	}
-}
+	for robot1.IsAlive() && robot2.IsAlive() {
+		turn++
+		fmt.Printf("\n--- Ход %d ---\n", turn)
 
-func (g *Game) StartBattle() { // процесс сражения роботов
-	for g.f.hp > 0 && g.s.hp > 0 {
-		g.DamagedRobots()
-	}
+		if robot1.IsAlive() {
+			robot1.ThrowsPlate(robot2)
+			if !robot2.IsAlive() {
+				fmt.Printf("%s побежден! %s побеждает!\n", robot2.name, robot1.name)
+				break
+			}
+		}
 
-	if g.f.hp <= 0 {
-		fmt.Printf("%s побеждает, %s уничтожен\n", g.s.name, g.f.name)
-	} else if g.s.hp <= 0 {
-		fmt.Printf("%s побеждает, %s уничтожен\n", g.f.name, g.s.name)
-	} else {
-		fmt.Println("Ничья")
+		if robot2.IsAlive() {
+			robot2.ThrowsPlate(robot1)
+			if !robot1.IsAlive() {
+				fmt.Printf("%s побежден! %s побеждает!\n", robot1.name, robot2.name)
+				break
+			}
+		}
+
+		fmt.Printf("%s: HP = %d, Борщ = %d\n", robot1.name, robot1.hp, robot1.stock)
+		fmt.Printf("%s: HP = %d, Борщ = %d\n", robot2.name, robot2.hp, robot2.stock)
 	}
 }
+
 func main() {
-	for {
-		game := Game{}
-		game.BeginGame()
-		game.StartBattle()
-	}
+	robot1 := NewRobot("Senior400k/nanosek", 10, 100, 15)
+	robot2 := NewRobot("Junior Developer", 8, 120, 12)
+
+	fmt.Println("Битва роботов начинается!")
+	BattleRobots(robot1, robot2)
 }

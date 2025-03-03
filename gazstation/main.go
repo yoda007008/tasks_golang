@@ -44,10 +44,7 @@ func (g *GazStation) GetFuel(amount int) bool { // проверяет доста
 	return true
 }
 
-func main() {
-	station := &GazStation{amountFuel: 100}
-	car := NewCar("Kia", 30, 50)
-	amount := 25
+func CarRefueling(station *GazStation, car *Car, amount int) { // отдельный метод для логики заправки
 	if station.GetFuel(amount) {
 		car.Refuel(amount)
 		fmt.Printf("Автомобилю %s удалось заправиться\n", car.name)
@@ -56,4 +53,11 @@ func main() {
 	}
 	fmt.Printf("Топливо в автомобиле %s: %d/%d\n", car.name, car.volume, car.maxVolume)
 	fmt.Printf("Топливо на заправке: %d", station.amountFuel)
+}
+
+func main() {
+	station := &GazStation{amountFuel: 100}
+	car := NewCar("Kia", 30, 50)
+	amount := 25
+	CarRefueling(station, car, amount)
 }

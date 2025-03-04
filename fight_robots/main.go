@@ -60,6 +60,12 @@ func (r *Robot) IsAlive() bool {
 	return r.hp > 0
 }
 
+func PerformAttack(attacker, defender *Robot) {
+	if attacker.IsAlive() {
+		attacker.ThrowsPlate(defender)
+	}
+}
+
 func BattleRobots(robot1, robot2 *Robot) {
 	rand.Seed(time.Now().UnixNano())
 
@@ -69,25 +75,25 @@ func BattleRobots(robot1, robot2 *Robot) {
 		turn++
 		fmt.Printf("\n--- Ход %d ---\n", turn)
 
-		if robot1.IsAlive() {
-			robot1.ThrowsPlate(robot2)
-			if !robot2.IsAlive() {
-				fmt.Printf("%s побежден! %s побеждает!\n", robot2.name, robot1.name)
-				break
-			}
+		PerformAttack(robot1, robot2)
+		if !robot2.IsAlive() {
+			fmt.Printf("%s побежден! %s побеждает!\n", robot2.name, robot1.name)
+			break
 		}
 
-		if robot2.IsAlive() {
-			robot2.ThrowsPlate(robot1)
-			if !robot1.IsAlive() {
-				fmt.Printf("%s побежден! %s побеждает!\n", robot1.name, robot2.name)
-				break
-			}
+		PerformAttack(robot1, robot2)
+		if !robot1.IsAlive() {
+			fmt.Printf("%s побежден! %s побеждает!\n", robot1.name, robot2.name)
+			break
 		}
 
-		fmt.Printf("%s: HP = %d, Борщ = %d\n", robot1.name, robot1.hp, robot1.stock)
-		fmt.Printf("%s: HP = %d, Борщ = %d\n", robot2.name, robot2.hp, robot2.stock)
+		robotStatus(robot1, robot2)
 	}
+}
+
+func robotStatus(robot1, robot2 *Robot) {
+	fmt.Printf("%s: HP = %d, Борщ = %d\n", robot1.name, robot1.hp, robot1.stock)
+	fmt.Printf("%s: HP = %d, Борщ = %d\n", robot2.name, robot2.hp, robot2.stock)
 }
 
 func main() {

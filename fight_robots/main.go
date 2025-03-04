@@ -23,14 +23,14 @@ func NewRobot(name string, stock, hp, damage int) *Robot {
 	}
 }
 
-func (r *Robot) ThrowsPlate(target *Robot) { // добавил новый метод
+func (r *Robot) ThrowsPlate(target *Robot) {
 	if r.isCooking {
 		fmt.Printf("%s пропускает ход, чтобы сварить новый борщ!\n", r.name)
 		r.isCooking = false
 		return
 	}
 
-	if r.stock <= 0 {
+	if r.stock == 0 {
 		fmt.Printf("%s пытается сварить новый борщ\n", r.name)
 		r.TryCook()
 		return
@@ -50,17 +50,19 @@ func (r *Robot) TryCook() {
 	if rand.Intn(10) < 2 {
 		fmt.Printf("%s взорвал кастрюлю и потерял 10 hp!\n", r.name)
 		r.hp -= 10
-	} else {
-		r.stock += 5
-		fmt.Printf("%s успешно сварил 5 литров борща!\n", r.name)
+		return
 	}
+
+	r.isCooking = true // после успешного приготовления снова начинаем готовить
+	r.stock += 5
+	fmt.Printf("%s успешно сварил 5 литров борща!\n", r.name)
 }
 
 func (r *Robot) IsAlive() bool {
 	return r.hp > 0
 }
 
-func PerformAttack(attacker, defender *Robot) {
+func (r *Robot) Attack(attacker, defender *Robot) {
 	if attacker.IsAlive() {
 		attacker.ThrowsPlate(defender)
 	}
@@ -75,13 +77,13 @@ func BattleRobots(robot1, robot2 *Robot) {
 		turn++
 		fmt.Printf("\n--- Ход %d ---\n", turn)
 
-		PerformAttack(robot1, robot2)
+		robot1.Attack(robot1, robot2)
 		if !robot2.IsAlive() {
 			fmt.Printf("%s побежден! %s побеждает!\n", robot2.name, robot1.name)
 			break
 		}
 
-		PerformAttack(robot1, robot2)
+		robot2.Attack(robot1, robot2)
 		if !robot1.IsAlive() {
 			fmt.Printf("%s побежден! %s побеждает!\n", robot1.name, robot2.name)
 			break

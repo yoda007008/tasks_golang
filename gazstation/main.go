@@ -39,8 +39,10 @@ func (c *Car) Refuel(amount int) { // добавляет топливо в ав�
 func (g *GazStation) GetFuel(amount int) bool { // проверяет достаточно ли топлива на заправке для автомобиля
 	if g.amountFuel < amount {
 		return false
+		fmt.Errorf("Недостаточно топлива на заправке")
 	}
 	g.amountFuel -= amount
+	fmt.Println("Топлива на заправке достаточно")
 	return true
 }
 
@@ -48,6 +50,9 @@ func CarRefueling(station *GazStation, car *Car, amount int) { // отдельн
 	if station.GetFuel(amount) {
 		car.Refuel(amount)
 		fmt.Printf("Автомобилю %s удалось заправиться\n", car.name)
+		if car.volume < amount {
+			fmt.Println("Купленное топливо не может превышать объем бака")
+		}
 	} else {
 		fmt.Println("На заправке недостаточно топлива")
 	}
@@ -57,7 +62,7 @@ func CarRefueling(station *GazStation, car *Car, amount int) { // отдельн
 
 func main() {
 	station := &GazStation{amountFuel: 100}
-	car := NewCar("Kia", 30, 50)
+	car := NewCar("Kia", 40, 50)
 	amount := 25
 	CarRefueling(station, car, amount)
 }

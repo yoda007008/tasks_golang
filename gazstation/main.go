@@ -47,12 +47,14 @@ func (g *GazStation) GetFuel(amount int) bool { // проверяет доста
 }
 
 func CarRefueling(station *GazStation, car *Car, amount int) { // отдельный метод для логики заправки
+	if car.volume < amount {
+		res := amount - car.volume
+		fmt.Printf("Помещается только %d литров, остальные %d литров лишние", car.volume, res)
+		car.volume = amount
+	}
 	if station.GetFuel(amount) {
 		car.Refuel(amount)
 		fmt.Printf("Автомобилю %s удалось заправиться\n", car.name)
-		if car.volume < amount {
-			fmt.Println("Купленное топливо не может превышать объем бака")
-		}
 	} else {
 		fmt.Println("На заправке недостаточно топлива")
 	}

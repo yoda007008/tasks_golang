@@ -52,7 +52,7 @@ func (b *BoardImpl) canPlaced(x, y, size int, o orientation) bool { // данн�
 	}
 	for i := -1; i <= size; i++ {
 		for j := -1; j <= size; j++ {
-			curX := x
+			curX := x // координаты клетки для проверки
 			curY := y
 
 			if o == gorizontal {
@@ -62,7 +62,7 @@ func (b *BoardImpl) canPlaced(x, y, size int, o orientation) bool { // данн�
 				curX += j
 				curY += i
 			}
-			if curX >= 0 && curX < boardSize && curY >= 0 && curY < boardSize {
+			if curX >= 0 && curX < boardSize && curY >= 0 && curY < boardSize { // не выходим за пределы поля, проверяем на занятость полей
 				if b.Board2d[curX][curY] != nil {
 					return false
 				}

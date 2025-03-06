@@ -11,6 +11,7 @@ const (
 )
 
 type Board interface {
+	PrintField()
 	PlaceShip(int) error
 	HandleShoot(int, int) (string, error)
 	Size() int
@@ -28,11 +29,51 @@ type BoardImpl struct {
 	Ships   []Ship
 }
 
-// todo создать метод, который реализовывает вывод игрового поля, пример: x := BoardImpl{...}, fmt.Println(x.String())
+func (b BoardImpl) PrintField() {
+	for i := 0; i < boardSize; i++ {
+		for j := 0; j < boardSize; j++ {
+			board := b.Board2d[i][j]
+			if board == nil {
+				fmt.Print(".")
+			} else {
+				fmt.Print("X")
+			}
+		}
+		fmt.Println()
+	}
+}
 
-func (b BoardImpl) PlaceShip(size int) error {
-	if size < 0 || size > 4 {
-		return fmt.Errorf("%w", "Invalid ship size")
+func (b *BoardImpl) canPlaced(x, y, size int, o orientation) bool { // данная функция проверяет, можем ли мы расположить корабль или нет
+	if o == gorizontal && x+size > boardSize { // проверка, что мы не выходим за границы поля
+		return false
+	}
+	if o == vertical && y+size > boardSize {
+		return false
+	}
+	for i := -1; i <= size; i++ {
+		for j := -1; j <= size; j++ {
+			curX := x
+			curY := y
+
+			if o == gorizontal {
+				curX += i
+				curY += j
+			} else {
+				curX += j
+				curY += i
+			}
+			if curX >= 0 && curX < boardSize && curY >= 0 && curY < boardSize {
+				if b.Board2d[curX][curY] != nil {
+					return false
+				}
+			}
+		}
+	}
+	return true
+}
+func (b *BoardImpl) PlaceShip(size int) error { // данная функция размещает корабли рандомно
+	if size < 1 || size > 4 {
+		fmt.Errorf("%d - данная длинна не походит", size)
 	}
 
 	o := orientation(rand.Intn(2))
@@ -41,17 +82,13 @@ func (b BoardImpl) PlaceShip(size int) error {
 		x := rand.Intn(boardSize)
 		y := rand.Intn(boardSize)
 
-		// проверка, не выходит ли корабль за поле
-		if o == gorizontal && x+size > boardSize {
-			continue
-		}
-		if o == vertical && y+size > boardSize {
+		if !b.canPlaced(x, y, size, o) {
 			continue
 		}
 
-		// проходимся по случаям, по которым нельзя разместить корабль
+		// Проверка, можно ли разместить корабль
 		canPlace := true
-		for i := 0; i <= size; i++ {
+		for i := 0; i < size; i++ {
 			if o == gorizontal && b.Board2d[x+i][y] != nil {
 				canPlace = false
 				break
@@ -65,18 +102,19 @@ func (b BoardImpl) PlaceShip(size int) error {
 			continue
 		}
 
-		// размещение корабля на поле
-		ship := StandardShipImpl{
-			decks:       make([]DeckStatus, 0, size),
+		// создание корабля
+		ship := &StandardShipImpl{
+			decks:       make([]DeckStatus, size),
 			x:           x,
 			y:           y,
 			orientation: int(o),
 			size:        size,
 		}
 		for j := 0; j < size; j++ {
-			ship.decks = append(ship.decks, AliveDeck)
+			ship.decks[j] = AliveDeck
 		}
 
+		// размещение корабля на поле
 		for i := 0; i < size; i++ {
 			if o == gorizontal {
 				b.Board2d[x+i][y] = ship
@@ -97,7 +135,7 @@ func (b BoardImpl) HandleShoot(x, y int) (string, error) {
 	}
 	ship := b.Board2d[x][y]
 	if ship == nil {
-		return "Miss shot", nil
+		return "Промахнулся", nil
 	}
 
 	// индекс палубы

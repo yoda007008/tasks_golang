@@ -14,7 +14,7 @@ type GameImpl struct {
 
 func NewGame(playersCount int) Game {
 	// todo init all entities
-	players := make([]Player, 0, playersCount)
+	//players := make([]Player, 0, playersCount)
 
 	// todo slice basics
 	// numbers := make([]int, 10, 10) // 0x01 [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], len = 10, cap = 10
@@ -22,13 +22,13 @@ func NewGame(playersCount int) Game {
 
 	// numbers2 := make([]int, 0, 10) // 0x01 [1, 2], len = 2, cap = 10
 
-	for i := 0; i < playersCount; i++ {
-		board := NewBoard()
-		players = append(players, &PlayerImpl{
-			id:    i,
-			board: board,
-		})
-	}
+	//for i := 0; i < playersCount; i++ {
+	//	board := NewBoard()
+	//	players = append(players, &PlayerImpl{
+	//		id:    i,
+	//		board: board,
+	//	})
+	//}
 
 	return &GameImpl{
 		players: nil,

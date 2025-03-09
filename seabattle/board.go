@@ -1,7 +1,6 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"math/rand"
 )
@@ -10,19 +9,18 @@ const (
 	boardSize = 10
 )
 
-type Board interface {
-	PrintField()
-	PlaceShip(int) error
-	HandleShoot(int, int) (string, error)
-	Size() int
-}
-
 type orientation int
 
 const (
 	gorizontal = 0
 	vertical   = 1
 )
+
+type Board interface {
+	PrintField()
+	PlaceShip(int) error
+	HandleShoot(int, int) string
+}
 
 type BoardImpl struct {
 	Board2d [boardSize][boardSize]Ship
@@ -36,13 +34,17 @@ func (b BoardImpl) PrintField() {
 			if board == nil {
 				fmt.Print(".")
 			} else {
-				fmt.Print("X")
+				switch board.GetStatus() {
+				case Alive, Hurt:
+					fmt.Print("X")
+				case Dead:
+					fmt.Print("D")
+				}
 			}
 		}
 		fmt.Println()
 	}
 }
-
 func (b *BoardImpl) canPlaced(x, y, size int, o orientation) bool { // данная функция проверяет, можем ли мы расположить корабль или нет
 	if o == gorizontal && x+size > boardSize { // проверка, что мы не выходим за границы поля
 		return false
@@ -128,46 +130,27 @@ func (b *BoardImpl) PlaceShip(size int) error { // данная функция �
 	return nil
 }
 
-func (b BoardImpl) HandleShoot(x, y int) (string, error) {
-	// todo validate в отдельной функции выше по коду 1 раз
-	if x < 0 || x >= boardSize || y < 0 || y >= boardSize {
-		fmt.Errorf("%w", errors.New("incorrect coords")) // todo custom error
+func (b BoardImpl) HandleShoot(x, y int) string {
+	if x < 0 || x > boardSize || y < 0 || y > boardSize {
+		return "Ошибка координат"
 	}
+
 	ship := b.Board2d[x][y]
 	if ship == nil {
-		return "Промахнулся", nil
+		return "Мимо"
 	}
-
-	// индекс палубы
-	//var deskIndex int
-	//switch o {
-	//case gorizontal: // две ориентации
-	//	deskIndex = x - ship.x
-	//case vertical:
-	//	deskIndex = y - ship.y
-	//}
-
-	switch ship.GetStatus() { // todo вычислить порядковый номер, перевести две координаты в одну. если горизонтально, то x - ship.x, если вертикально y - ship.y
-	case Alive:
-		ship.HandleShoot()
-	case Hurt:
-		ship.HandleShoot()
-	case Dead:
-		fmt.Println(false)
+	if ship.HandleShoot(x, y) {
+		status := ship.GetStatus()
+		switch status {
+		case Alive:
+			return "Попал"
+		case Hurt:
+			return "Корабль ранен"
+		case Dead:
+			return "Корабль уничтожен"
+		}
 	}
-
-	return "Ошибка координат", nil
-	// Игровое поле
-	// &Ship{}, &Ship{}, &Ship{}, nil, nil // [0, 0], [0, 1], [0, 2] => [0, 1, 2], пример выстрел 0 2, так как корабль горизонтальный, то 2-0 = 2 это координата палубы внутри корабля
-	// nil, nil, nil, nil, nil
-	// nil, nil, nil, nil, nil
-	// nil, nil, nil, nil, nil
-	// nil, nil, nil, nil, nil
-}
-
-func (b BoardImpl) Size() int {
-	//TODO implement me
-	panic("implement me")
+	return "Ошибка координат"
 }
 
 func NewBoard() Board {

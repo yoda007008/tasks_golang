@@ -46,20 +46,20 @@ func (p *PlayerImpl) DoMove(otherPlayers []Player) error { // todo не знае
 }
 
 // TakeMove принимает и обрабатывает выстрел
-func (p *PlayerImpl) TakeMove(x, y int) {
-	//TODO implement me
-	p.board.HandleShoot(x, y)
-	panic("implement me")
-}
+//func (p *PlayerImpl) TakeMove(x, y int) {
+//	//TODO implement me
+//	p.board.HandleShoot(x, y)
+//	panic("implement me")
+//}
 
 func (p *PlayerImpl) GiveUp() {
 	//TODO implement me
 	panic("implement me")
 }
 
-func NewPlayer() Player {
-	return &PlayerImpl{}
-}
+//func NewPlayer() Player {
+//	return &PlayerImpl{}
+//}
 
 // todo
 func validateInput() error {

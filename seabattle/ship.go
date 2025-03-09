@@ -17,7 +17,7 @@ const (
 
 type Ship interface {
 	GetStatus() ShipStatus
-	HandleShoot()
+	HandleShoot(x int, y int) bool
 }
 
 type StandardShipImpl struct {
@@ -25,6 +25,7 @@ type StandardShipImpl struct {
 	x           int // todo getX, координата начальной точки корабля
 	y           int // todo getY, координата начальной точки корабля
 	orientation int // todo iota
+	status      ShipStatus
 	size        int
 }
 
@@ -43,7 +44,16 @@ func (s StandardShipImpl) GetStatus() ShipStatus {
 	return Hurt
 }
 
-func (s StandardShipImpl) HandleShoot() {
-	//TODO implement me
-	panic("implement me")
+func (s StandardShipImpl) HandleShoot(x, y int) bool {
+	index := -1 // определяем какая палуба была поражена
+	if s.orientation == gorizontal {
+		index = x - s.x
+	} else {
+		index = y - s.y
+	}
+	if index >= 0 && index <= s.size {
+		s.decks[index] = DeadDeck
+		return true
+	}
+	return false
 }

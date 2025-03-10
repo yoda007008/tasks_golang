@@ -38,7 +38,7 @@ func (b BoardImpl) PrintField() {
 				case Alive, Hurt:
 					fmt.Print("X")
 				case Dead:
-					fmt.Print("D")
+					fmt.Print("D") // корабль мертв
 				}
 			}
 		}
@@ -75,7 +75,7 @@ func (b *BoardImpl) canPlaced(x, y, size int, o orientation) bool { // данн�
 }
 func (b *BoardImpl) PlaceShip(size int) error { // данная функция размещает корабли рандомно
 	if size < 1 || size > 4 {
-		fmt.Errorf("%d - данная длинна не походит", size)
+		fmt.Errorf("%d - данная длинна не подходит", size)
 	}
 
 	o := orientation(rand.Intn(2))
@@ -130,7 +130,7 @@ func (b *BoardImpl) PlaceShip(size int) error { // данная функция �
 	return nil
 }
 
-func (b BoardImpl) HandleShoot(x, y int) string {
+func (b BoardImpl) HandleShoot(x, y int) string { // функция проверяет можно ли стрелять по полю
 	if x < 0 || x > boardSize || y < 0 || y > boardSize {
 		return "Ошибка координат"
 	}
@@ -150,7 +150,7 @@ func (b BoardImpl) HandleShoot(x, y int) string {
 			return "Корабль уничтожен"
 		}
 	}
-	return "Ошибка координат"
+	return "Ошибка, некорректный ввод"
 }
 
 func NewBoard() Board {

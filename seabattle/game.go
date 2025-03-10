@@ -58,6 +58,5 @@ func (g *GameImpl) Round() {
 }
 
 func (g *GameImpl) IsEnded() bool {
-	// todo implement me
 	return false
 }

@@ -1,21 +1,13 @@
 package main
 
 import (
-	"errors"
 	"fmt"
-),
-	"github.com/eiannone/keyboard"
 )
 
 type Player interface {
 	DoMove(otherPlayers []Player) error
-	TakeMove(x, y int)
+	TakeMove(int, int)
 	GiveUp()
-}
-
-// как вариант использовать интерфейсы: сделать мок реализацию игрока с методом DoMove(), которая будет просто выводить: "Игрок [id] делает ход"
-type MockPlayer struct {
-	id int
 }
 
 type PlayerImpl struct {
@@ -23,33 +15,36 @@ type PlayerImpl struct {
 	board Board
 }
 
-func (p *MockPlayer) DoMove(otherPlayers []Player) error { // todo не знаем про boardSize ? board.Size()
-	//TODO implement me
+func (p *PlayerImpl) DoMove(otherPlayers []Player) error {
 	var x, y int
-	fmt.Printf("Игрок %d ваш ход. Введите координату выстрела x\n", p.id)
-	// todo выделить в отдельную структуру координату, на ней сделать метод New() error, и возвращать там ошибку
-	// todo сделать пользовательский ввод, пока он не введёт корректные координаты
-	fmt.Scan(&x, &y)
-	fmt.Printf("Игрок %d ваш ход. Введите координату выстрела y\n", p.id)
-
-
-	for _, p := range otherPlayers {
-		p.TakeMove(x, y)
+	for {
+		fmt.Printf("Игрок %d ваш ход. Введите координату выстрела x и y (через пробел):\n", p.id)
+		_, err := fmt.Scan(&x, &y)
+		if err == nil && x >= 0 && y >= 0 {
+			break
+		}
+		fmt.Println("Ошибка ввода. Пожалуйста, введите корректные координаты.")
 	}
 
-	return errors.New("Ошибка координат")
+	for _, player := range otherPlayers {
+		player.TakeMove(x, y)
+	}
+
+	return nil
 }
 
-// TakeMove принимает и обрабатывает выстрел
 func (p *PlayerImpl) TakeMove(x, y int) {
 	fmt.Printf("Игрок %d сделал ход по координатам (%d, %d)", p.id, x, y)
 	p.board.HandleShoot(x, y)
 }
 
 func (p *PlayerImpl) GiveUp() {
-	fmt.Printf("Игрок %d сдался", p.id)
+	fmt.Printf("Игрок %d сдался\n", p.id)
 }
 
-func NewPlayer() Player {
-	return &PlayerImpl{}
+func NewPlayer(id int, board Board) Player {
+	return &PlayerImpl{
+		id:    id,
+		board: board,
+	}
 }

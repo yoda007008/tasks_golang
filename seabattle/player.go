@@ -13,6 +13,7 @@ type Player interface {
 type PlayerImpl struct {
 	id    int
 	board Board
+	size  int
 }
 
 func (p *PlayerImpl) DoMove(otherPlayers []Player) error {
@@ -36,15 +37,17 @@ func (p *PlayerImpl) DoMove(otherPlayers []Player) error {
 func (p *PlayerImpl) TakeMove(x, y int) {
 	fmt.Printf("Игрок %d сделал ход по координатам (%d, %d)", p.id, x, y)
 	p.board.HandleShoot(x, y)
+
 }
 
 func (p *PlayerImpl) GiveUp() {
 	fmt.Printf("Игрок %d сдался\n", p.id)
 }
 
-func NewPlayer(id int, board Board) Player {
+func NewPlayer(id int, board Board, size int) Player {
 	return &PlayerImpl{
 		id:    id,
 		board: board,
+		size:  size,
 	}
 }

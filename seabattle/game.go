@@ -1,7 +1,6 @@
 package main
 
 type Game interface {
-	//Start()
 	Round()
 	IsEnded() bool // todo как понять что игра окончена? У одного игрока все корабли остались в живых
 }

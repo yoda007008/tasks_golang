@@ -1,61 +1,56 @@
 package main
 
+import "fmt"
+
 type Game interface {
 	Round()
-	IsEnded() bool // todo как понять что игра окончена? У одного игрока все корабли остались в живых
+	IsEnded() bool
 }
 
 type GameImpl struct {
-	players []Player // todo когда игра окончена, у всех игроков, кроме победителя, все корабли мертвы
-	ships   []Ship
+	players []Player
 	isEnded bool
 }
 
 func NewGame(playersCount int) Game {
-	// todo init all entities
-	//players := make([]Player, 0, playersCount)
+	players := make([]Player, 0, playersCount)
 
-	// todo slice basics
-	// numbers := make([]int, 10, 10) // 0x01 [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], len = 10, cap = 10
-	// 0x02 [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5], len = 11, cap = 20
-
-	// numbers2 := make([]int, 0, 10) // 0x01 [1, 2], len = 2, cap = 10
-
-	//for i := 0; i < playersCount; i++ {
-	//	board := NewBoard()
-	//	players = append(players, &PlayerImpl{
-	//		id:    i,
-	//		board: board,
-	//	})
-	//}
+	for i := 0; i < playersCount; i++ {
+		board := NewBoard()
+		players = append(players, &PlayerImpl{
+			id:     i,
+			board:  board,
+			status: true,
+		})
+	}
 
 	return &GameImpl{
-		players: nil,
-		ships:   nil,
+		players: players,
 		isEnded: false,
 	}
 }
 
-//func (g *GameImpl) Start() {
-//
-//}
-
 func (g *GameImpl) Round() {
-	for id, p := range g.players { // [p0, p1, p2, p3]
+	for id, p := range g.players {
+		// Создаем список других игроков, исключая текущего
 		otherPlayers := make([]Player, 0, len(g.players)-1)
-		if id == len(g.players)-1 {
-			otherPlayers = append(otherPlayers, g.players[:id]...) // todo refactor duplicate code
-		} else {
-			otherPlayers = append(otherPlayers, g.players[:id]...)
-			otherPlayers = append(otherPlayers, g.players[id+1:]...)
-		}
+		otherPlayers = append(g.players[:id], g.players[id+1:]...)
 
-		p.DoMove(otherPlayers) // если ходит игрок 1, то в otherPlayers будет игрок 2 например в случае если игрока 2
+		err := p.DoMove(otherPlayers)
+		if err != nil {
+			fmt.Printf("Игрок %d ошибся: %v\n", id, err)
+		}
 	}
 
-	// todo в конце раунда проверяем состояние кораблей у игроков и определяем, окончена игра или нет, и если окончена то кто победитель(победитель тот, кто остался в живых) => у кого хотя бы один корабль жив, а у остальных все корабли мертвы
+	g.isEnded = g.IsEnded()
 }
 
 func (g *GameImpl) IsEnded() bool {
-	return false
+	alivePlayers := 0
+	for _, p := range g.players {
+		if p.GetStatusPlayer() == true {
+			alivePlayers++
+		}
+	}
+	return alivePlayers <= 1
 }

@@ -10,18 +10,13 @@ const (
 
 type DeckStatus int
 
-const (
-	AliveDeck DeckStatus = iota
-	DeadDeck
-)
-
 type Ship interface {
 	GetStatus() ShipStatus
 	HandleShoot(x int, y int) bool
 }
 
 type StandardShipImpl struct {
-	decks       []DeckStatus
+	decks       []ShipStatus
 	x           int // todo getX, координата начальной точки корабля
 	y           int // todo getY, координата начальной точки корабля
 	orientation int // todo iota
@@ -32,7 +27,7 @@ type StandardShipImpl struct {
 func (s StandardShipImpl) GetStatus() ShipStatus {
 	deadCount := 0
 	for _, status := range s.decks {
-		if status == DeadDeck {
+		if status == Dead {
 			deadCount++
 		}
 	}
@@ -44,16 +39,21 @@ func (s StandardShipImpl) GetStatus() ShipStatus {
 	return Hurt
 }
 
-func (s StandardShipImpl) HandleShoot(x, y int) bool {
-	index := -1 // определяем какая палуба была поражена
+func (s *StandardShipImpl) HandleShoot(x, y int) bool {
 	if s.orientation == gorizontal {
-		index = x - s.x
+		if y != s.y || x < s.x || x >= s.x+s.size {
+			return false
+		}
+		s.decks[x-s.x] = Dead
 	} else {
-		index = y - s.y
+		if x != s.x || y < s.y || y >= s.y+s.size {
+			return false
+		}
+		s.decks[y-s.y] = Dead
 	}
-	if index >= 0 && index <= s.size {
-		s.decks[index] = DeadDeck
-		return true
-	}
-	return false
+	return true
+}
+
+func NewShip() Ship {
+	return &StandardShipImpl{}
 }

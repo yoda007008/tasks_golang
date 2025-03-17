@@ -32,7 +32,7 @@ func NewGame(playersCount int) Game {
 
 func (g *GameImpl) Round() {
 	for id, p := range g.players {
-		// Пропускаем ход, если игрок уже выбыл
+
 		if !p.StatusPlayer() {
 			continue
 		}

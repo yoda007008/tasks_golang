@@ -7,11 +7,9 @@ func main() {
 
 	shipSizes := []int{4, 3, 3, 2, 2, 2, 1, 1, 1, 1}
 
-	// Размещаем корабли на поле каждого игрока
 	for _, player := range game.(*GameImpl).players {
 		p := player.(*PlayerImpl)
 
-		// Размещаем корабли из массива shipSizes
 		for _, size := range shipSizes {
 			err := p.board.PlaceShipRandom(size)
 			if err != nil {

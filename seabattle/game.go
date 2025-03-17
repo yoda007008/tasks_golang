@@ -37,23 +37,23 @@ func (g *GameImpl) Round() {
 			continue
 		}
 
-		fmt.Printf("\n--- Ход игрока %d ---\n", id)
+		fmt.Printf("\n Ход игрока %d \n", id)
 
-		// Создаем список других игроков, исключая текущего
+		// создаем список других игроков, исключая текущего
 		otherPlayers := make([]Player, 0, len(g.players)-1)
 		otherPlayers = append(g.players[:id], g.players[id+1:]...)
 
-		// Игрок делает ход
+		// игрок делает ход
 		err := p.DoMove(otherPlayers)
 		if err != nil {
 			fmt.Printf("Игрок %d ошибся: %v\n", id, err)
 		}
 
-		// Выводим поле текущего игрока после хода
+		// выводим поле текущего игрока после хода
 		fmt.Printf("\nПоле игрока %d после хода:\n", id)
 		p.(*PlayerImpl).board.PrintField()
 
-		// Проверяем, завершилась ли игра после хода
+		// проверяем, завершилась ли игра после хода
 		if g.IsEnded() {
 			break
 		}

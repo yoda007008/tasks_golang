@@ -28,22 +28,44 @@ type BoardImpl struct {
 	Ships   []Ship
 }
 
-type Cell struct {
+type Cell interface {
+	GetStatus() bool
+	SetStatus(status bool)
+	GetShip() Ship
+	SetShip(ship Ship)
+}
+
+type CellImpl struct {
 	status bool
 	ship   Ship
 }
 
+func (c *CellImpl) GetStatus() bool {
+	return c.status
+}
+
+func (c *CellImpl) SetStatus(status bool) {
+	c.status = status
+}
+
+func (c *CellImpl) GetShip() Ship {
+	return c.ship
+}
+
+func (c *CellImpl) SetShip(ship Ship) {
+	c.ship = ship
+}
 func (b BoardImpl) PrintField() {
 	for i := 0; i < boardSize; i++ {
 		for j := 0; j < boardSize; j++ {
 			cell := b.Board2d[i][j]
-			if cell.status {
-				if cell.ship != nil {
+			if cell.GetStatus() {
+				if cell.GetShip() != nil {
 					fmt.Print("X ") // попадание
 				} else {
 					fmt.Print("O ") // промах
 				}
-			} else if cell.ship != nil {
+			} else if cell.GetShip() != nil {
 				fmt.Print("S ") // корабль (для отладки)
 			} else {
 				fmt.Print(". ") // пустая клетка
@@ -73,7 +95,7 @@ func (b *BoardImpl) canPlaced(x, y, size int, o orientation) bool {
 				curY += i
 			}
 			if curX >= 0 && curX < boardSize && curY >= 0 && curY < boardSize {
-				if b.Board2d[curX][curY].ship != nil {
+				if b.Board2d[curX][curY].GetShip() != nil {
 					return false
 				}
 			}
@@ -96,9 +118,9 @@ func (b *BoardImpl) PlaceShipCoords(x, y, size int, o orientation) bool {
 	}
 	for i := 0; i < size; i++ {
 		if o == gorizontal {
-			b.Board2d[x+i][y].ship = ship
+			b.Board2d[x+i][y].SetShip(ship)
 		} else {
-			b.Board2d[x][y+i].ship = ship
+			b.Board2d[x][y+i].SetShip(ship)
 		}
 	}
 	b.Ships = append(b.Ships, ship)
@@ -131,15 +153,15 @@ func (b *BoardImpl) HandleShoot(x, y int) string {
 		return "Ошибка координат"
 	}
 
-	cell := &b.Board2d[x][y]
-	cell.status = true
+	cell := b.Board2d[x][y]
+	cell.SetStatus(true)
 
-	if cell.ship == nil {
+	if cell.GetShip() == nil {
 		return "Мимо"
 	}
 
-	if cell.ship.HandleShoot(x, y) {
-		status := cell.ship.GetStatus()
+	if cell.GetShip().HandleShoot(x, y) {
+		status := cell.GetShip().GetStatus()
 		switch status {
 		case Alive:
 			return "Попал"
@@ -153,5 +175,11 @@ func (b *BoardImpl) HandleShoot(x, y int) string {
 }
 
 func NewBoard() Board {
-	return &BoardImpl{}
+	board := &BoardImpl{}
+	for i := 0; i < boardSize; i++ {
+		for j := 0; j < boardSize; j++ {
+			board.Board2d[i][j] = &CellImpl{}
+		}
+	}
+	return board
 }

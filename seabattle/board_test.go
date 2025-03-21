@@ -33,13 +33,35 @@ func TestMockBoard_PlaceShipCoords(t *testing.T) {
 	}
 }
 
-func TestMockBoard_PrintField(t *testing.T) {
+func TestPrintField(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
+	// мок-объекты для клеток
+	mockCell1 := NewMockCell(ctrl)
+	mockCell2 := NewMockCell(ctrl)
+	mockCell3 := NewMockCell(ctrl)
 
-	mockBoard := NewMockBoard(ctrl)
-	mockBoard.EXPECT().PrintField()
-	mockBoard.PrintField()
+	mockShip1 := NewMockCell(ctrl)
+	mockShip2 := NewMockCell(ctrl)
+
+	// настраиваем мок-объекты
+	mockCell1.EXPECT().GetStatus().Return(true).AnyTimes()
+	mockCell1.EXPECT().GetShip().Return(mockShip1) // &CellImpl{}
+
+	mockCell2.EXPECT().GetStatus().Return(false).AnyTimes()
+	mockCell2.EXPECT().GetShip().Return(mockShip1).AnyTimes()
+
+	mockCell3.EXPECT().GetStatus().Return(false).AnyTimes()
+	mockCell3.EXPECT().GetShip().Return(mockShip2) // &CellImpl{}
+
+	board := BoardImpl{
+		Board2d: [10][10]Cell{
+			{mockCell1, mockCell2, mockCell3},
+			{mockCell2, mockCell3, mockCell1},
+			{mockCell3, mockCell2, mockCell1},
+		},
+	}
+	board.PrintField()
 }
 
 func TestMockCell_GetStatus_SetStatus(t *testing.T) {

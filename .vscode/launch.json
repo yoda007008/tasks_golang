@@ -1,7 +1,6 @@
 {
 	"version": "0.2.0",
 	"configurations": [
-		
 		{
 			"name": "Launch file",
 			"type": "go",
@@ -23,6 +22,14 @@
 			"mode": "auto",
 			"args": [],
 			"program": "c:\\Users\\Кирилл\\GolandProjects\\lesson\\seabattle"
+		},
+		{
+			"type": "go",
+			"name": "debug board_test.go",
+			"request": "launch",
+			"mode": "auto",
+			"args": [],
+			"program": "c:\\Users\\Кирилл\\GolandProjects\\lesson\\seabattle\\board_test.go"
 		}
 	]
 }

@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"seabattle/seabattle/interfaces"
 )
 
 type Player interface {
@@ -13,7 +14,7 @@ type Player interface {
 
 type PlayerImpl struct {
 	id     int
-	board  Board
+	board  interfaces.Board
 	status bool
 }
 
@@ -50,7 +51,7 @@ func (p *PlayerImpl) StatusPlayer() bool {
 	return p.status
 }
 
-func NewPlayer(id int, board Board, status bool) Player {
+func NewPlayer(id int, board interfaces.Board, status bool) Player {
 	return &PlayerImpl{
 		id:     id,
 		board:  board,

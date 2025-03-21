@@ -1,4 +1,4 @@
-package main
+package interfaces
 
 import (
 	"fmt"
@@ -28,34 +28,7 @@ type BoardImpl struct {
 	Ships   []Ship
 }
 
-type Cell interface {
-	GetStatus() bool
-	SetStatus(status bool)
-	GetShip() Ship
-	SetShip(ship Ship)
-}
-
-type CellImpl struct {
-	status bool
-	ship   Ship
-}
-
-func (c *CellImpl) GetStatus() bool {
-	return c.status
-}
-
-func (c *CellImpl) SetStatus(status bool) {
-	c.status = status
-}
-
-func (c *CellImpl) GetShip() Ship {
-	return c.ship
-}
-
-func (c *CellImpl) SetShip(ship Ship) {
-	c.ship = ship
-}
-func (b BoardImpl) PrintField() {
+func (b *BoardImpl) PrintField() {
 	for i := 0; i < boardSize; i++ {
 		for j := 0; j < boardSize; j++ {
 			cell := b.Board2d[i][j]

@@ -1,6 +1,9 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"seabattle/seabattle/interfaces"
+)
 
 type Game interface {
 	Round()
@@ -16,7 +19,7 @@ func NewGame(playersCount int) Game {
 	players := make([]Player, 0, playersCount)
 
 	for i := 0; i < playersCount; i++ {
-		board := NewBoard()
+		board := interfaces.NewBoard()
 		players = append(players, &PlayerImpl{
 			id:     i,
 			board:  board,

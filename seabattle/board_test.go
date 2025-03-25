@@ -3,6 +3,8 @@ package main
 
 import (
 	"github.com/golang/mock/gomock"
+	"io"
+	"os"
 	"seabattle/seabattle/mocks"
 	"seabattle/seabattle/realization"
 	"testing"
@@ -46,8 +48,36 @@ func TestPrintField(t *testing.T) {
 		}
 	}
 
-	// тестируем PrintField()
+	oldStdout := os.Stdout
+
+	r, w, _ := os.Pipe()
+	os.Stdout = w
+
 	board.PrintField()
+
+	w.Close()
+	os.Stdout = oldStdout
+
+	out, _ := io.ReadAll(r)
+	actualOutput := string(out)
+
+	// ожидаемый результат
+	expectedOutput := `X S O . . . . . . . 
+. . . . . . . . . . 
+. . . . . . . . . . 
+. . . . . . . . . . 
+. . . . . . . . . . 
+. . . . . . . . . . 
+. . . . . . . . . . 
+. . . . . . . . . . 
+. . . . . . . . . . 
+. . . . . . . . . . 
+`
+	// сравнение
+	if actualOutput != expectedOutput {
+		t.Errorf("\nОжидаемый вывод:\n%s\nФактический вывод:\n%s",
+			expectedOutput, actualOutput)
+	}
 }
 func TestHandleShoot(t *testing.T) {
 

@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"seabattle/seabattle/interfaces"
+	"seabattle/seabattle/realization"
 )
 
 type Game interface {
@@ -19,7 +19,7 @@ func NewGame(playersCount int) Game {
 	players := make([]Player, 0, playersCount)
 
 	for i := 0; i < playersCount; i++ {
-		board := interfaces.NewBoard()
+		board := realization.NewBoard()
 		players = append(players, &PlayerImpl{
 			id:     i,
 			board:  board,

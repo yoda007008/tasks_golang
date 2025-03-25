@@ -1,4 +1,4 @@
-package interfaces
+package realization
 
 type ShipStatus int
 

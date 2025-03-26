@@ -31,7 +31,8 @@ func TestPrintField(t *testing.T) {
 	mockCell3.EXPECT().GetShip().Return(nil)
 
 	// создаем тестовую доску
-	board := realization.NewBoard().(*realization.BoardImpl)
+	//board := realization.NewBoard().(*realization.BoardImpl)
+	board := realization.BoardImpl{}
 
 	// заполняем поле
 	board.Board2d[0][0] = mockCell1
@@ -79,10 +80,59 @@ func TestPrintField(t *testing.T) {
 			expectedOutput, actualOutput)
 	}
 }
+
 func TestHandleShoot(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
 
+	// мок клетки + мок доска
+	mockCell := mocks.NewMockCell(ctrl)
+	mockShip := mocks.NewMockShip(ctrl)
+
+	// поле с мок клетками
+	board := &realization.BoardImpl{
+		Board2d: [10][10]realization.Cell{
+			{mockCell}, // Клетка (0,0)
+			// Остальные клетки могут быть nil или реальными
+		},
+	}
+
+	// промах
+	t.Run("Промах", func(t *testing.T) {
+		mockCell = mocks.NewMockCell(ctrl)
+		mockCell.EXPECT().SetStatus(true)
+		mockCell.EXPECT().GetShip().Return(nil)
+
+		result := board.HandleShoot(0, 0)
+		if result != "Мимо" {
+			t.Errorf("Expected 'Мимо', got '%s'", result)
+		}
+	})
+
+	// попадание
+	t.Run("Попадание", func(t *testing.T) {
+		mockCell = mocks.NewMockCell(ctrl) // этот тест не проходит
+		mockShip = mocks.NewMockShip(ctrl)
+
+		mockCell.EXPECT().SetStatus(true)
+		mockCell.EXPECT().GetShip().Return(mockShip)
+		mockShip.EXPECT().HandleShoot(0, 0).Return(true)
+		mockShip.EXPECT().GetStatus().Return(realization.Alive)
+
+		result := board.HandleShoot(0, 0)
+		if result != "Попал" {
+			t.Errorf("Expected 'Попал', got '%s'", result)
+		}
+	})
+
+	// ошибка кординат
+	t.Run("Ошибка координат", func(t *testing.T) {
+		result := board.HandleShoot(-1, 0)
+		if result != "Ошибка координат" {
+			t.Errorf("Expected 'Ошибка координат', got '%s'", result)
+		}
+	})
 }
-
 func TestPlaceShipCoords(t *testing.T) {
 
 }

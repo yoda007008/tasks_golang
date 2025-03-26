@@ -21,6 +21,7 @@ type MockShip struct {
 	ctrl     *gomock.Controller
 	recorder *MockShipMockRecorder
 	isgomock struct{}
+	status   realization.ShipStatus
 }
 
 // MockShipMockRecorder is the mocks recorder for MockShip.

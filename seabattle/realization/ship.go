@@ -8,8 +8,6 @@ const (
 	Dead                    // мёртв
 )
 
-type DeckStatus int
-
 type Ship interface {
 	GetStatus() ShipStatus
 	HandleShoot(x int, y int) bool

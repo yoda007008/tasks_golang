@@ -33,6 +33,7 @@ type Cell interface {
 	SetStatus(status bool)
 	GetShip() Ship
 	SetShip(ship Ship)
+	//canPlaced(x int, y int, size int, o orientation) bool
 }
 
 type CellImpl struct {
@@ -76,7 +77,7 @@ func (b *BoardImpl) PrintField() {
 	}
 }
 
-func (b *BoardImpl) canPlaced(x, y, size int, o orientation) bool {
+func (b *BoardImpl) CanPlaced(x, y, size int, o orientation) bool {
 	if o == gorizontal && x+size > boardSize {
 		return false
 	}
@@ -106,7 +107,7 @@ func (b *BoardImpl) canPlaced(x, y, size int, o orientation) bool {
 }
 
 func (b *BoardImpl) PlaceShipCoords(x, y, size int, o orientation) bool {
-	if !b.canPlaced(x, y, size, o) {
+	if !b.CanPlaced(x, y, size, o) {
 		return false
 	}
 
@@ -139,7 +140,7 @@ func (b *BoardImpl) PlaceShipRandom(size int) error {
 		x := rand.Intn(boardSize)
 		y := rand.Intn(boardSize)
 
-		if !b.canPlaced(x, y, size, o) {
+		if !b.CanPlaced(x, y, size, o) {
 			continue
 		}
 

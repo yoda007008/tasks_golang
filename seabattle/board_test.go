@@ -215,4 +215,154 @@ func TestCanPlaced(t *testing.T) {
 			t.Error("Ожидалось успешное размещение корабля")
 		}
 	})
+
+	t.Run("Вертикальный корабль в пределах доски", func(t *testing.T) {
+
+		// основные ячейки корабля (2,2)-(4,2)
+		for i := 2; i < 5; i++ {
+			mockCells[i][2].EXPECT().GetShip().Return(nil).AnyTimes()
+		}
+
+		// левый ряд (x=1)
+		for j := 1; j <= 3; j++ {
+			mockCells[1][j].EXPECT().GetShip().Return(nil).AnyTimes()
+		}
+
+		// правый ряд (x=5)
+		for j := 1; j <= 3; j++ {
+			mockCells[5][j].EXPECT().GetShip().Return(nil).AnyTimes()
+		}
+
+		// верхняя граница (y=1)
+		for i := 1; i <= 5; i++ {
+			mockCells[i][1].EXPECT().GetShip().Return(nil).AnyTimes()
+		}
+
+		// нижняя граница (y=3)
+		for i := 1; i <= 5; i++ {
+			mockCells[i][3].EXPECT().GetShip().Return(nil).AnyTimes()
+		}
+
+		// диагональные углы
+		mockCells[1][1].EXPECT().GetShip().Return(nil).AnyTimes()
+		mockCells[1][3].EXPECT().GetShip().Return(nil).AnyTimes()
+		mockCells[5][1].EXPECT().GetShip().Return(nil).AnyTimes()
+		mockCells[5][3].EXPECT().GetShip().Return(nil).AnyTimes()
+
+		// замокаем все остальные ячейки как свободные
+		for i := 0; i < 10; i++ {
+			for j := 0; j < 10; j++ {
+				if (i >= 2 && i <= 4 && j == 2) ||
+					(i >= 1 && i <= 5 && j >= 1 && j <= 3) {
+					continue
+				}
+				mockCells[i][j].EXPECT().GetShip().Return(nil).AnyTimes()
+			}
+		}
+
+		result := board.CanPlaced(2, 2, 3, realization.Orientation(vertical))
+
+		if !result {
+			t.Error("Ожидалось успешное вертикальное размещение корабля")
+		}
+	})
+
+	t.Run("Горизонтальное размещение корабля у правого края", func(t *testing.T) {
+		ctrl.Finish()
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
+
+		// Полная переинициализация всех ячеек
+		var mockCells [10][10]*mocks.MockCell
+		var boardCells [10][10]realization.Cell
+		for i := range mockCells {
+			for j := range mockCells[i] {
+				mockCells[i][j] = mocks.NewMockCell(ctrl)
+				boardCells[i][j] = mockCells[i][j]
+			}
+		}
+		board := &realization.BoardImpl{Board2d: boardCells}
+
+		x, y, size := 7, 0, 3
+
+		for i := x; i < x+size; i++ {
+			mockCells[0][i].EXPECT().GetShip().Return(nil).AnyTimes()
+		}
+
+		for i := x - 1; i <= x+size; i++ {
+			if i >= 0 && i < 10 {
+				mockCells[1][i].EXPECT().GetShip().Return(nil).AnyTimes()
+			}
+		}
+
+		// Левый бок (x=6)
+		mockCells[0][6].EXPECT().GetShip().Return(nil).AnyTimes()
+		mockCells[1][6].EXPECT().GetShip().Return(nil).AnyTimes()
+
+		// Правый бок (x=10 - не существует)
+
+		// 3. Замокаем ВСЕ остальные ячейки как свободные
+		for i := 0; i < 10; i++ {
+			for j := 0; j < 10; j++ {
+				if (i == 0 && j >= 7 && j <= 9) || // Основные ячейки
+					(i == 1 && j >= 6 && j <= 9) { // Нижний ряд
+					continue
+				}
+				mockCells[i][j].EXPECT().GetShip().Return(nil).AnyTimes()
+			}
+		}
+
+		result := board.CanPlaced(x, y, size, realization.Orientation(gorizontal))
+
+		if !result {
+			t.Error("Ожидалось успешное размещение у правого края")
+		}
+	})
+
+	t.Run("Вертикальный корабль в левом верхнем углу", func(t *testing.T) {
+		ctrl.Finish()
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
+
+		var mockCells [10][10]*mocks.MockCell
+		var boardCells [10][10]realization.Cell
+		for i := range mockCells {
+			for j := range mockCells[i] {
+				mockCells[i][j] = mocks.NewMockCell(ctrl)
+				boardCells[i][j] = mockCells[i][j]
+			}
+		}
+		board := &realization.BoardImpl{Board2d: boardCells}
+
+		x, y, size := 0, 0, 2 // координаты корабля в в левом верхнем углу
+
+		for i := y; i < y+size; i++ {
+			mockCells[i][x].EXPECT().GetShip().Return(nil).AnyTimes()
+		}
+
+		// тестируем соседние ячейки
+		for j := y; j < y+size; j++ {
+			if j < 10 {
+				mockCells[j][1].EXPECT().GetShip().Return(nil).AnyTimes()
+			}
+		}
+
+		mockCells[2][0].EXPECT().GetShip().Return(nil).AnyTimes()
+		mockCells[2][1].EXPECT().GetShip().Return(nil).AnyTimes()
+
+		for i := 0; i < 10; i++ {
+			for j := 0; j < 10; j++ {
+				if (i >= 0 && i < 2 && j == 0) || // Основные ячейки
+					(i >= 0 && i <= 2 && j == 1) { // Соседние
+					continue
+				}
+				mockCells[i][j].EXPECT().GetShip().Return(nil).AnyTimes()
+			}
+		}
+
+		result := board.CanPlaced(x, y, size, realization.Orientation(vertical))
+		if !result {
+			t.Error("Ожидалось размещение в левом верхнем углу")
+		}
+	})
 }

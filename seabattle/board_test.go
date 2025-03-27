@@ -82,7 +82,7 @@ func TestPrintField(t *testing.T) {
 }
 
 func TestHandleShoot(t *testing.T) {
-	// Тест на промах
+	// промах
 	t.Run("Промах", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
@@ -127,6 +127,7 @@ func TestHandleShoot(t *testing.T) {
 		}
 	})
 
+	// ошибка координат
 	t.Run("Ошибка координат", func(t *testing.T) {
 		board := realization.NewBoard()
 
@@ -150,27 +151,68 @@ func TestHandleShoot(t *testing.T) {
 	})
 }
 
-//func TestPlaceShipCoordsAndCanPlaced(t *testing.T) {
-//	ctrl := gomock.NewController(t)
-//	defer ctrl.Finish()
-//
-//	// создание mock ячеек для доски
-//	mockCells := make([][]*mocks.MockCell, 10)
-//	for i, _ := range mockCells {
-//		mockCells[i] = make([]*mocks.MockCell, 10)
-//		for j, _ := range mockCells {
-//			mockCells[i][j] = mocks.NewMockCell(ctrl)
-//		}
-//	}
-//
-//	// создание доски
-//	board := &realization.BoardImpl{
-//		Board2d: mockCells,
-//		Ships:   make([]*realization.StandardShipImpl, 0),
-//	}
-//
-//	// заменяем функцию canPlaced на более удобное применение
-//	originalCanPlaced := realization.BoardImpl{}.CanPlaced
-//	defer func() { realization.BoardImpl{}.CanPlaced() = originalCanPlaced}
-//
-//}
+func TestCanPlaced(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	const (
+		gorizontal = iota
+		vertical
+	)
+
+	// Создаем mock-ячейки для всей доски
+	var mockCells [10][10]*mocks.MockCell
+	var boardCells [10][10]realization.Cell
+
+	for i := range mockCells {
+		for j := range mockCells[i] {
+			mockCells[i][j] = mocks.NewMockCell(ctrl)
+			boardCells[i][j] = mockCells[i][j]
+		}
+	}
+
+	board := &realization.BoardImpl{
+		Board2d: boardCells,
+	}
+
+	t.Run("Горизонтальный корабль в пределах доски", func(t *testing.T) {
+		for i := 0; i < 3; i++ {
+			mockCells[0][i].EXPECT().GetShip().Return(nil).AnyTimes()
+		}
+
+		// Соседние ячейки:
+		// Верхний ряд (y=1)
+		for i := -1; i <= 3; i++ {
+			if i >= 0 && i < 10 {
+				mockCells[1][i].EXPECT().GetShip().Return(nil).AnyTimes()
+			}
+		}
+
+		// боковые ячейки (x=-1 и x=3)
+		if 3 < 10 {
+			mockCells[0][3].EXPECT().GetShip().Return(nil).AnyTimes()
+		}
+		// x=-1 - за границей, не мокаем
+
+		mockCells[1][1].EXPECT().GetShip().Return(nil).AnyTimes()
+		mockCells[1][3].EXPECT().GetShip().Return(nil).AnyTimes()
+
+		for i := 0; i < 10; i++ {
+			for j := 0; j < 10; j++ {
+				// Пропускаем уже замоканые ячейки
+				if (i == 0 && j >= 0 && j < 3) ||
+					(i == 1 && j >= -1 && j <= 3) ||
+					(i == 0 && j == 3) {
+					continue
+				}
+				mockCells[i][j].EXPECT().GetShip().Return(nil).AnyTimes()
+			}
+		}
+
+		result := board.CanPlaced(0, 0, 3, realization.Orientation(gorizontal))
+
+		if !result {
+			t.Error("Ожидалось успешное размещение корабля")
+		}
+	})
+}

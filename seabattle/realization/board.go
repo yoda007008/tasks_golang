@@ -9,7 +9,7 @@ const (
 	boardSize = 10
 )
 
-type orientation int
+type Orientation int
 
 const (
 	gorizontal = 0
@@ -20,7 +20,7 @@ type Board interface {
 	PrintField()
 	PlaceShipRandom(int) error
 	HandleShoot(int, int) string
-	PlaceShipCoords(int, int, int, orientation) bool
+	PlaceShipCoords(int, int, int, Orientation) bool
 }
 
 type BoardImpl struct {
@@ -77,7 +77,7 @@ func (b *BoardImpl) PrintField() {
 	}
 }
 
-func (b *BoardImpl) CanPlaced(x, y, size int, o orientation) bool {
+func (b *BoardImpl) CanPlaced(x, y, size int, o Orientation) bool {
 	if o == gorizontal && x+size > boardSize {
 		return false
 	}
@@ -106,7 +106,7 @@ func (b *BoardImpl) CanPlaced(x, y, size int, o orientation) bool {
 	return true
 }
 
-func (b *BoardImpl) PlaceShipCoords(x, y, size int, o orientation) bool {
+func (b *BoardImpl) PlaceShipCoords(x, y, size int, o Orientation) bool {
 	if !b.CanPlaced(x, y, size, o) {
 		return false
 	}
@@ -134,7 +134,7 @@ func (b *BoardImpl) PlaceShipRandom(size int) error {
 		return fmt.Errorf("%d - данная длина не подходит", size)
 	}
 
-	o := orientation(rand.Intn(2))
+	o := Orientation(rand.Intn(2))
 	shipPlaced := false
 	for !shipPlaced {
 		x := rand.Intn(boardSize)

@@ -100,6 +100,29 @@ func TestHandleShoot(t *testing.T) {
 		}
 	})
 
+	// уничтожение корабля
+	//t.Run("Уничтожение корабля", func(t *testing.T) {
+	//	ctrl := gomock.NewController(t)
+	//	ctrl.Finish()
+	//
+	//	mockCell := mocks.NewMockCell(ctrl)
+	//	mockShip := mocks.NewMockShip(ctrl)
+	//
+	//	board := realization.NewBoard().(*realization.BoardImpl)
+	//	board.Board2d
+	//	board.Board2d[0][0] = mockCell
+	//
+	//	mockCell.EXPECT().SetStatus(true).Times(1)
+	//	mockCell.EXPECT().GetShip().Return(mockShip).AnyTimes()
+	//	mockCell.EXPECT().HandleShoot(0, 0).Return(true)
+	//	mockCell.EXPECT().GetStatus().Return(realization.Dead)
+	//
+	//	result := board.HandleShoot(0, 0)
+	//	if result != "Корабль уничтожен" {
+	//		t.Errorf("Expected 'Корабль уничтожен' got '%s'", result)
+	//	}
+	//})
+
 	// попадание
 	t.Run("Попадание", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
@@ -113,9 +136,7 @@ func TestHandleShoot(t *testing.T) {
 		board.Board2d = [10][10]realization.Cell{} // обнуление доски
 		board.Board2d[0][0] = mockCell
 
-		mockCell.EXPECT().GetShip().
-			Return(mockShip).
-			AnyTimes()
+		mockCell.EXPECT().GetShip().Return(mockShip).AnyTimes()
 
 		mockCell.EXPECT().SetStatus(true).Times(1)
 		mockShip.EXPECT().HandleShoot(0, 0).Return(true)
@@ -267,94 +288,95 @@ func TestCanPlaced(t *testing.T) {
 		}
 	})
 
-	t.Run("Горизонтальное размещение корабля у правого края", func(t *testing.T) {
-		ctrl.Finish()
-		ctrl := gomock.NewController(t) // инициализация мок-контроллера и завершение предыдущего
-		defer ctrl.Finish()
+	t.Run("Горизонтальное размещение корабля у правого края", func(t *testing.T) { // запускаем подтест с описанием горизонтальное размещение корабля у правого края
+		ctrl.Finish()                   // завершаем работу предыдущего контроллера
+		ctrl := gomock.NewController(t) // инициализация мок-контроллера
+		defer ctrl.Finish()             // данный вывов гаранитирует отчистку после завершения теста
 
 		// полная переинициализация всех ячеек
 		var mockCells [10][10]*mocks.MockCell   // инициализируем тестируемые клетки
 		var boardCells [10][10]realization.Cell // инициализируем тестовое поле
 		for i := range mockCells {              // данный цикл заполняет поле тестируемыми клетками
 			for j := range mockCells[i] {
-				mockCells[i][j] = mocks.NewMockCell(ctrl)
-				boardCells[i][j] = mockCells[i][j]
+				mockCells[i][j] = mocks.NewMockCell(ctrl) // создаем mock-ячейку
+				boardCells[i][j] = mockCells[i][j]        // присваиваем mock-ячейку ячейке доски
 			}
 		}
 
 		// инициализируем готовое к тестам поле
 		board := &realization.BoardImpl{Board2d: boardCells}
 
-		x, y, size := 7, 0, 3 // координаты корабля, который находится у правого края
+		x, y, size := 7, 0, 3 // координаты корабля, который находится у правого края (size 3, x = 7, y = 0)
 
-		// тут не помню, что это означает
-		for i := x; i < x+size; i++ {
-			mockCells[0][i].EXPECT().GetShip().Return(nil).AnyTimes()
+		// настраиваем ожидания для основных ячеек корабля
+		for i := x; i < x+size; i++ { // корабль горизонтальный, поэтому меняем x(i) в диапазоне от 7 до 9 (7+3=10)
+			mockCells[0][i].EXPECT().GetShip().Return(nil).AnyTimes() // вызываем метод GetShip, который вернет статус nil, что корабля действительно нет
 		}
 
-		// тут тестирую соседние ячейки и проверяю не выодят ли они за грацицу поля
-		for i := x - 1; i <= x+size; i++ {
-			if i >= 0 && i < 10 {
-				mockCells[1][i].EXPECT().GetShip().Return(nil).AnyTimes()
+		// тут тестирую соседние ячейки и проверяю не выодят ли они за границу поля
+		for i := x - 1; i <= x+size; i++ { // прохожусь по ячейкам
+			if i >= 0 && i < 10 { // проверка не выходит ли за границу поля
+				mockCells[1][i].EXPECT().GetShip().Return(nil).AnyTimes() // вызываем метод GetShip, который вернет статус nil, что корабля действительно нет
 			}
 		}
 
-		// левый бок
-		mockCells[0][6].EXPECT().GetShip().Return(nil).AnyTimes()
-		mockCells[1][6].EXPECT().GetShip().Return(nil).AnyTimes()
+		// настройка отдельных левых ячеек слева
+		mockCells[0][6].EXPECT().GetShip().Return(nil).AnyTimes() // левый сосед основной ячейки [0][6]
+		mockCells[1][6].EXPECT().GetShip().Return(nil).AnyTimes() // левый сосед нижней ячейки [1][6]
 
 		// замокаем все остальные ячейки как свободные
 		for i := 0; i < 10; i++ { // проходимся по row
 			for j := 0; j < 10; j++ { // проходимся по col
+				// пропуск ячеек, которые уже настроены
 				if (i == 0 && j >= 7 && j <= 9) || // основные ячейки
 					(i == 1 && j >= 6 && j <= 9) { // нижний ряд
 					continue
 				}
-				mockCells[i][j].EXPECT().GetShip().Return(nil).AnyTimes() // возвращаем в
+				mockCells[i][j].EXPECT().GetShip().Return(nil).AnyTimes() // для всех остальных ожидаем метод GetShip(), который вернет ni
 			}
 		}
 
 		// тестируем CanPlaced, если результат не совпадает с ожидаемым, то выводим ошибку
 		result := board.CanPlaced(x, y, size, realization.Orientation(gorizontal))
 
-		if !result {
-			t.Error("Ожидалось успешное размещение у правого края")
+		if !result { // если ожидается не result, то выводим ошибку
+			t.Error("Ожидалось успешное размещение у правого края") // вывод ошибки
 		}
 	})
 
 	t.Run("Вертикальный корабль в левом верхнем углу", func(t *testing.T) {
-		ctrl.Finish()
-		ctrl := gomock.NewController(t) // инициализация мок-контроллера и завершение предыдущего
-		defer ctrl.Finish()
+		ctrl.Finish()                   // завершаем работу предыдущего контроллера
+		ctrl := gomock.NewController(t) // инициализация мок-контроллера
+		defer ctrl.Finish()             // данный вывов гаранитирует отчистку после завершения теста
 
 		var mockCells [10][10]*mocks.MockCell   // инициализируем тестированные мок клетки
 		var boardCells [10][10]realization.Cell // инициализируем тестируемое поле
 		for i := range mockCells {              // данный цикл заполняет тестируемое поле мок-клетками
 			for j := range mockCells[i] {
-				mockCells[i][j] = mocks.NewMockCell(ctrl)
-				boardCells[i][j] = mockCells[i][j]
+				mockCells[i][j] = mocks.NewMockCell(ctrl) // создаем фейковую клетку игрового поля
+				boardCells[i][j] = mockCells[i][j]        // присваем ее игровому полю
 			}
 		}
 
 		board := &realization.BoardImpl{Board2d: boardCells} // инициализация заполненнного тестируемого поля
 
-		x, y, size := 0, 0, 2 // координаты корабля в левом верхнем углу
+		x, y, size := 0, 0, 2 // координаты корабля в левом верхнем углу (size = 2, x = 0, y = 0)
 
-		// тут не помню
+		// настройка размещения ключевых ячеек корабля y(i) от 0 до 1 (0+2=2)
 		for i := y; i < y+size; i++ {
-			mockCells[i][x].EXPECT().GetShip().Return(nil).AnyTimes()
+			mockCells[i][x].EXPECT().GetShip().Return(nil).AnyTimes() // вызов GetShip=клетка свободна nil
 		}
 
 		// тестируем соседние ячейки при помощи цикла
 		for j := y; j < y+size; j++ {
-			if j < 10 {
-				mockCells[j][1].EXPECT().GetShip().Return(nil).AnyTimes()
+			if j < 10 { // проверка, чтобы не выйти за нижнюю границу поля
+				mockCells[j][1].EXPECT().GetShip().Return(nil).AnyTimes() // аналогично настройка соседних клеток справа
 			}
 		}
 
 		// левый бок при y = 2
-		mockCells[2][0].EXPECT().GetShip().Return(nil).AnyTimes()
-		mockCells[2][1].EXPECT().GetShip().Return(nil).AnyTimes()
+		mockCells[2][0].EXPECT().GetShip().Return(nil).AnyTimes() // левая клетка под кораблем (0, 2)
+		mockCells[2][1].EXPECT().GetShip().Return(nil).AnyTimes() // правая клетка под кораблем (2, 1)
 
 		// замокаем все остальные ячейки как свободные
 		for i := 0; i < 10; i++ { // проходимся по row
@@ -363,14 +385,14 @@ func TestCanPlaced(t *testing.T) {
 					(i >= 0 && i <= 2 && j == 1) { // соседние
 					continue
 				}
-				mockCells[i][j].EXPECT().GetShip().Return(nil).AnyTimes()
+				mockCells[i][j].EXPECT().GetShip().Return(nil).AnyTimes() // все остальные клетки тоже свободные
 			}
 		}
 
 		// тестируем CanPlaced, если результат не совпадает с ожидаемым, то выводим ошибку
 		result := board.CanPlaced(x, y, size, realization.Orientation(vertical))
-		if !result {
-			t.Error("Ожидалось размещение в левом верхнем углу")
+		if !result { // если не result
+			t.Error("Ожидалось размещение в левом верхнем углу") // возвращаем ошибку
 		}
 	})
 }

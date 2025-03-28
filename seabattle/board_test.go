@@ -451,4 +451,30 @@ func TestCanPlaced(t *testing.T) {
 			t.Error("Ожидалось размещение в левом верхнем углу") // возвращаем ошибку
 		}
 	})
+
+	t.Run("Граничные случаи CanPlaced", func(t *testing.T) {
+		ctrl.Finish()
+		board := realization.NewBoard().(*realization.BoardImpl)
+
+		cases := []struct {
+			x, y, size int
+			o          realization.Orientation
+			expected   bool
+		}{
+			{9, 0, 1, realization.Orientation(gorizontal), true},  // крайняя правая
+			{0, 9, 1, realization.Orientation(vertical), true},    // крайняя нижняя
+			{8, 0, 2, realization.Orientation(gorizontal), true},  // у правого края
+			{0, 8, 2, realization.Orientation(vertical), true},    // у нижнего края
+			{9, 0, 2, realization.Orientation(gorizontal), false}, // выходит за правый край
+			{0, 9, 2, realization.Orientation(vertical), false},   // выходит за нижний край
+		}
+
+		for _, tc := range cases {
+			result := board.CanPlaced(tc.x, tc.y, tc.size, tc.o)
+			if result != tc.expected {
+				t.Errorf("Для (%d,%d) size=%d ориентация=%v ожидалось %v, получено %v",
+					tc.x, tc.y, tc.size, tc.o, tc.expected, result)
+			}
+		}
+	})
 }

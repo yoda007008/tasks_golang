@@ -156,6 +156,11 @@ func (b *BoardImpl) HandleShoot(x, y int) string {
 	}
 
 	cell := b.Board2d[x][y]
+
+	if cell.GetStatus() {
+		return "Уже стреляли"
+	}
+
 	cell.SetStatus(true)
 
 	if cell.GetShip() == nil {

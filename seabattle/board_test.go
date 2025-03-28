@@ -109,7 +109,6 @@ func TestHandleShoot(t *testing.T) {
 		mockShip := mocks.NewMockShip(ctrl)
 
 		board := realization.NewBoard().(*realization.BoardImpl)
-		//board.Board2d = [10][10]realization.Cell{}
 		board.Board2d[0][0] = mockCell
 
 		mockCell.EXPECT().SetStatus(true).Times(1)
@@ -145,6 +144,26 @@ func TestHandleShoot(t *testing.T) {
 		result := board.HandleShoot(0, 0)
 		if result != "Попал" {
 			t.Errorf("Expected 'Попал', got '%s'", result)
+		}
+	})
+
+	// проверяем клетку в которую уже стреляли
+	t.Run("Уже стреляли", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
+
+		mockCell := mocks.NewMockCell(ctrl)
+
+		board := realization.NewBoard().(*realization.BoardImpl)
+		board.Board2d[0][0] = mockCell
+
+		mockCell.EXPECT().GetShip().AnyTimes()
+		mockCell.EXPECT().SetStatus(true).AnyTimes()
+		mockCell.EXPECT().GetStatus().Return(true).Times(1)
+
+		result := board.HandleShoot(0, 0)
+		if result != "Уже стреляли" {
+			t.Errorf("Expected 'Уже стреляли', got '%s'", result)
 		}
 	})
 

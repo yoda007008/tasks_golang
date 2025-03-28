@@ -157,8 +157,6 @@ func TestHandleShoot(t *testing.T) {
 		board := realization.NewBoard().(*realization.BoardImpl)
 		board.Board2d[0][0] = mockCell
 
-		mockCell.EXPECT().GetShip().AnyTimes()
-		mockCell.EXPECT().SetStatus(true).AnyTimes()
 		mockCell.EXPECT().GetStatus().Return(true).Times(1)
 
 		result := board.HandleShoot(0, 0)

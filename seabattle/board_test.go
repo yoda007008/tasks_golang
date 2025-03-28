@@ -269,49 +269,52 @@ func TestCanPlaced(t *testing.T) {
 
 	t.Run("Горизонтальное размещение корабля у правого края", func(t *testing.T) {
 		ctrl.Finish()
-		ctrl := gomock.NewController(t)
+		ctrl := gomock.NewController(t) // инициализация мок-контроллера и завершение предыдущего
 		defer ctrl.Finish()
 
-		// Полная переинициализация всех ячеек
-		var mockCells [10][10]*mocks.MockCell
-		var boardCells [10][10]realization.Cell
-		for i := range mockCells {
+		// полная переинициализация всех ячеек
+		var mockCells [10][10]*mocks.MockCell   // инициализируем тестируемые клетки
+		var boardCells [10][10]realization.Cell // инициализируем тестовое поле
+		for i := range mockCells {              // данный цикл заполняет поле тестируемыми клетками
 			for j := range mockCells[i] {
 				mockCells[i][j] = mocks.NewMockCell(ctrl)
 				boardCells[i][j] = mockCells[i][j]
 			}
 		}
+
+		// инициализируем готовое к тестам поле
 		board := &realization.BoardImpl{Board2d: boardCells}
 
-		x, y, size := 7, 0, 3
+		x, y, size := 7, 0, 3 // координаты корабля, который находится у правого края
 
+		// тут не помню, что это означает
 		for i := x; i < x+size; i++ {
 			mockCells[0][i].EXPECT().GetShip().Return(nil).AnyTimes()
 		}
 
+		// тут тестирую соседние ячейки и проверяю не выодят ли они за грацицу поля
 		for i := x - 1; i <= x+size; i++ {
 			if i >= 0 && i < 10 {
 				mockCells[1][i].EXPECT().GetShip().Return(nil).AnyTimes()
 			}
 		}
 
-		// Левый бок (x=6)
+		// левый бок
 		mockCells[0][6].EXPECT().GetShip().Return(nil).AnyTimes()
 		mockCells[1][6].EXPECT().GetShip().Return(nil).AnyTimes()
 
-		// Правый бок (x=10 - не существует)
-
-		// 3. Замокаем ВСЕ остальные ячейки как свободные
-		for i := 0; i < 10; i++ {
-			for j := 0; j < 10; j++ {
-				if (i == 0 && j >= 7 && j <= 9) || // Основные ячейки
-					(i == 1 && j >= 6 && j <= 9) { // Нижний ряд
+		// замокаем все остальные ячейки как свободные
+		for i := 0; i < 10; i++ { // проходимся по row
+			for j := 0; j < 10; j++ { // проходимся по col
+				if (i == 0 && j >= 7 && j <= 9) || // основные ячейки
+					(i == 1 && j >= 6 && j <= 9) { // нижний ряд
 					continue
 				}
-				mockCells[i][j].EXPECT().GetShip().Return(nil).AnyTimes()
+				mockCells[i][j].EXPECT().GetShip().Return(nil).AnyTimes() // возвращаем в
 			}
 		}
 
+		// тестируем CanPlaced, если результат не совпадает с ожидаемым, то выводим ошибку
 		result := board.CanPlaced(x, y, size, realization.Orientation(gorizontal))
 
 		if !result {
@@ -321,7 +324,7 @@ func TestCanPlaced(t *testing.T) {
 
 	t.Run("Вертикальный корабль в левом верхнем углу", func(t *testing.T) {
 		ctrl.Finish()
-		ctrl := gomock.NewController(t) // инициализация мок-контроллера
+		ctrl := gomock.NewController(t) // инициализация мок-контроллера и завершение предыдущего
 		defer ctrl.Finish()
 
 		var mockCells [10][10]*mocks.MockCell   // инициализируем тестированные мок клетки
@@ -337,7 +340,7 @@ func TestCanPlaced(t *testing.T) {
 
 		x, y, size := 0, 0, 2 // координаты корабля в левом верхнем углу
 
-		// тут тоже не помню
+		// тут не помню
 		for i := y; i < y+size; i++ {
 			mockCells[i][x].EXPECT().GetShip().Return(nil).AnyTimes()
 		}
@@ -349,13 +352,13 @@ func TestCanPlaced(t *testing.T) {
 			}
 		}
 
-		// вот тут не помню
+		// левый бок при y = 2
 		mockCells[2][0].EXPECT().GetShip().Return(nil).AnyTimes()
 		mockCells[2][1].EXPECT().GetShip().Return(nil).AnyTimes()
 
-		// тут тоже не помню
-		for i := 0; i < 10; i++ {
-			for j := 0; j < 10; j++ {
+		// замокаем все остальные ячейки как свободные
+		for i := 0; i < 10; i++ { // проходимся по row
+			for j := 0; j < 10; j++ { // проходимся по col
 				if (i >= 0 && i < 2 && j == 0) || // основные ячейки
 					(i >= 0 && i <= 2 && j == 1) { // соседние
 					continue

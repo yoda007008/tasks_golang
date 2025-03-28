@@ -321,45 +321,50 @@ func TestCanPlaced(t *testing.T) {
 
 	t.Run("Вертикальный корабль в левом верхнем углу", func(t *testing.T) {
 		ctrl.Finish()
-		ctrl := gomock.NewController(t)
+		ctrl := gomock.NewController(t) // инициализация мок-контроллера
 		defer ctrl.Finish()
 
-		var mockCells [10][10]*mocks.MockCell
-		var boardCells [10][10]realization.Cell
-		for i := range mockCells {
+		var mockCells [10][10]*mocks.MockCell   // инициализируем тестированные мок клетки
+		var boardCells [10][10]realization.Cell // инициализируем тестируемое поле
+		for i := range mockCells {              // данный цикл заполняет тестируемое поле мок-клетками
 			for j := range mockCells[i] {
 				mockCells[i][j] = mocks.NewMockCell(ctrl)
 				boardCells[i][j] = mockCells[i][j]
 			}
 		}
-		board := &realization.BoardImpl{Board2d: boardCells}
 
-		x, y, size := 0, 0, 2 // координаты корабля в в левом верхнем углу
+		board := &realization.BoardImpl{Board2d: boardCells} // инициализация заполненнного тестируемого поля
 
+		x, y, size := 0, 0, 2 // координаты корабля в левом верхнем углу
+
+		// тут тоже не помню
 		for i := y; i < y+size; i++ {
 			mockCells[i][x].EXPECT().GetShip().Return(nil).AnyTimes()
 		}
 
-		// тестируем соседние ячейки
+		// тестируем соседние ячейки при помощи цикла
 		for j := y; j < y+size; j++ {
 			if j < 10 {
 				mockCells[j][1].EXPECT().GetShip().Return(nil).AnyTimes()
 			}
 		}
 
+		// вот тут не помню
 		mockCells[2][0].EXPECT().GetShip().Return(nil).AnyTimes()
 		mockCells[2][1].EXPECT().GetShip().Return(nil).AnyTimes()
 
+		// тут тоже не помню
 		for i := 0; i < 10; i++ {
 			for j := 0; j < 10; j++ {
-				if (i >= 0 && i < 2 && j == 0) || // Основные ячейки
-					(i >= 0 && i <= 2 && j == 1) { // Соседние
+				if (i >= 0 && i < 2 && j == 0) || // основные ячейки
+					(i >= 0 && i <= 2 && j == 1) { // соседние
 					continue
 				}
 				mockCells[i][j].EXPECT().GetShip().Return(nil).AnyTimes()
 			}
 		}
 
+		// тестируем CanPlaced, если результат не совпадает с ожидаемым, то выводим ошибку
 		result := board.CanPlaced(x, y, size, realization.Orientation(vertical))
 		if !result {
 			t.Error("Ожидалось размещение в левом верхнем углу")

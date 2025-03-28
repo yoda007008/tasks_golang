@@ -91,6 +91,7 @@ func TestHandleShoot(t *testing.T) {
 		board := realization.NewBoard().(*realization.BoardImpl)
 		board.Board2d[0][0] = mockCell
 
+		mockCell.EXPECT().GetStatus().Return(false) // изначально клетка не обстреляна
 		mockCell.EXPECT().SetStatus(true)
 		mockCell.EXPECT().GetShip().Return(nil) // Клетка пуста
 
@@ -111,6 +112,7 @@ func TestHandleShoot(t *testing.T) {
 		board := realization.NewBoard().(*realization.BoardImpl)
 		board.Board2d[0][0] = mockCell
 
+		mockCell.EXPECT().GetStatus().Return(false)
 		mockCell.EXPECT().SetStatus(true).Times(1)
 		mockCell.EXPECT().GetShip().Return(mockShip).AnyTimes()
 		mockShip.EXPECT().HandleShoot(0, 0).Return(true)
@@ -135,8 +137,8 @@ func TestHandleShoot(t *testing.T) {
 		board.Board2d = [10][10]realization.Cell{} // обнуление доски
 		board.Board2d[0][0] = mockCell
 
+		mockCell.EXPECT().GetStatus().Return(false)
 		mockCell.EXPECT().GetShip().Return(mockShip).AnyTimes()
-
 		mockCell.EXPECT().SetStatus(true).Times(1)
 		mockShip.EXPECT().HandleShoot(0, 0).Return(true)
 		mockShip.EXPECT().GetStatus().Return(realization.Alive)
@@ -358,6 +360,43 @@ func TestCanPlaced(t *testing.T) {
 
 		if !result { // если ожидается не result, то выводим ошибку
 			t.Error("Ожидалось успешное размещение у правого края") // вывод ошибки
+		}
+	})
+
+	t.Run("Тест на расположение рядом с другим кораблем", func(t *testing.T) {
+		ctrl.Finish()
+
+		// Создаем mock-ячейки для всей доски
+		var mockCells [10][10]*mocks.MockCell
+		var boardCells [10][10]realization.Cell
+
+		for i := range mockCells {
+			for j := range mockCells[i] {
+				mockCells[i][j] = mocks.NewMockCell(ctrl)
+				boardCells[i][j] = mockCells[i][j]
+			}
+		}
+
+		board := &realization.BoardImpl{
+			Board2d: boardCells,
+		}
+
+		mockCells[1][1].EXPECT().GetShip().Return(&realization.StandardShipImpl{}).AnyTimes()
+
+		x, y, size := 1, 1, 2
+
+		for i := 0; i < 10; i++ {
+			for j := 0; j < 10; j++ {
+				if i == 1 && j == 1 {
+					continue
+				}
+				mockCells[i][j].EXPECT().GetShip().Return(nil).AnyTimes()
+			}
+		}
+
+		result := board.CanPlaced(x, y, size, realization.Orientation(gorizontal))
+		if result {
+			t.Error("Ожидалось размещение другого корабля")
 		}
 	})
 

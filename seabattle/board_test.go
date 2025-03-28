@@ -101,27 +101,27 @@ func TestHandleShoot(t *testing.T) {
 	})
 
 	// уничтожение корабля
-	//t.Run("Уничтожение корабля", func(t *testing.T) {
-	//	ctrl := gomock.NewController(t)
-	//	ctrl.Finish()
-	//
-	//	mockCell := mocks.NewMockCell(ctrl)
-	//	mockShip := mocks.NewMockShip(ctrl)
-	//
-	//	board := realization.NewBoard().(*realization.BoardImpl)
-	//	board.Board2d
-	//	board.Board2d[0][0] = mockCell
-	//
-	//	mockCell.EXPECT().SetStatus(true).Times(1)
-	//	mockCell.EXPECT().GetShip().Return(mockShip).AnyTimes()
-	//	mockCell.EXPECT().HandleShoot(0, 0).Return(true)
-	//	mockCell.EXPECT().GetStatus().Return(realization.Dead)
-	//
-	//	result := board.HandleShoot(0, 0)
-	//	if result != "Корабль уничтожен" {
-	//		t.Errorf("Expected 'Корабль уничтожен' got '%s'", result)
-	//	}
-	//})
+	t.Run("Уничтожение корабля", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		ctrl.Finish()
+
+		mockCell := mocks.NewMockCell(ctrl)
+		mockShip := mocks.NewMockShip(ctrl)
+
+		board := realization.NewBoard().(*realization.BoardImpl)
+		//board.Board2d = [10][10]realization.Cell{}
+		board.Board2d[0][0] = mockCell
+
+		mockCell.EXPECT().SetStatus(true).Times(1)
+		mockCell.EXPECT().GetShip().Return(mockShip).AnyTimes()
+		mockShip.EXPECT().HandleShoot(0, 0).Return(true)
+		mockShip.EXPECT().GetStatus().Return(realization.Dead)
+
+		result := board.HandleShoot(0, 0)
+		if result != "Корабль уничтожен" {
+			t.Errorf("Expected 'Корабль уничтожен' got '%s'", result)
+		}
+	})
 
 	// попадание
 	t.Run("Попадание", func(t *testing.T) {

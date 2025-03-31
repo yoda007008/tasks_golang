@@ -79,6 +79,37 @@ func TestPrintField(t *testing.T) {
 		t.Errorf("\nОжидаемый вывод:\n%s\nФактический вывод:\n%s",
 			expectedOutput, actualOutput)
 	}
+	t.Run("Пустая доска без кораблей", func(t *testing.T) {
+		ctrl.Finish()
+		board := realization.NewBoard().(*realization.BoardImpl)
+
+		oldStdout := os.Stdout
+
+		r, w, _ := os.Pipe()
+		os.Stdout = w
+
+		board.PrintField()
+
+		w.Close()
+		os.Stdout = oldStdout
+
+		out, _ := io.ReadAll(r)
+		actualOutput := string(out)
+		expectedOutput := `. . . . . . . . . . 
+. . . . . . . . . . 
+. . . . . . . . . . 
+. . . . . . . . . . 
+. . . . . . . . . . 
+. . . . . . . . . . 
+. . . . . . . . . . 
+. . . . . . . . . . 
+. . . . . . . . . . 
+. . . . . . . . . . 
+`
+		if actualOutput != expectedOutput {
+			t.Errorf("\nОжидаемый вывод:\n%s\nФактический вывод:\n%s", actualOutput, expectedOutput)
+		}
+	})
 }
 
 func TestHandleShoot(t *testing.T) {
@@ -475,6 +506,131 @@ func TestCanPlaced(t *testing.T) {
 				t.Errorf("Для (%d,%d) size=%d ориентация=%v ожидалось %v, получено %v",
 					tc.x, tc.y, tc.size, tc.o, tc.expected, result)
 			}
+		}
+	})
+}
+
+func TestPlaceShipCoords(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	// Инициализация mock-клеток
+	var mockCells [10][10]*mocks.MockCell
+	var boardCells [10][10]realization.Cell
+
+	for i := range mockCells {
+		for j := range mockCells[i] {
+			mockCells[i][j] = mocks.NewMockCell(ctrl)
+			boardCells[i][j] = mockCells[i][j]
+		}
+	}
+
+	board := &realization.BoardImpl{
+		Board2d: boardCells,
+		Ships:   make([]realization.Ship, 0),
+	}
+
+	t.Run("Проверка на выход за границу поля", func(t *testing.T) {
+		// настройка ожиданий во всех клетках
+		for i := range mockCells {
+			for j := range mockCells[i] {
+				mockCells[i][j].EXPECT().GetShip().Return(nil).AnyTimes()
+			}
+		}
+
+		cases := []struct {
+			x, y, size int
+			o          realization.Orientation
+		}{
+			{8, 0, 3, realization.Orientation(0)},  // выходит за правую границу
+			{0, 8, 3, realization.Orientation(1)},  // выходит за нижнюю границу
+			{0, -1, 3, realization.Orientation(1)}, // проверки на отрицательные координаты
+			{-1, 0, 3, realization.Orientation(1)},
+		}
+
+		for _, tc := range cases {
+			result := board.PlaceShipCoords(tc.x, tc.y, tc.size, tc.o)
+			if result {
+				t.Errorf("Ожидалось false для координат (%d, %d)", tc.x, tc.y)
+			}
+		}
+
+	})
+
+	t.Run("Успешное горизонтальное расположение корабля", func(t *testing.T) {
+		ctrl.Finish()
+		// 1. Настраиваем основные клетки корабля (2,3)-(4,3)
+		for i := 0; i < 3; i++ {
+			mockCells[2+i][3].EXPECT().GetShip().Return(nil)
+		}
+
+		for i := 1; i <= 5; i++ {
+			for j := 2; j <= 4; j++ {
+				if !(i >= 2 && i <= 4 && j == 3) {
+					mockCells[i][j].EXPECT().GetShip().Return(nil).AnyTimes()
+				}
+			}
+		}
+
+		for i := 0; i < 3; i++ {
+			mockCells[2+i][3].EXPECT().SetShip(gomock.Any())
+		}
+
+		for i := 0; i < 10; i++ {
+			for j := 0; j < 10; j++ {
+				if (i >= 2 && i <= 4 && j == 3) || // Основные клетки
+					(i >= 1 && i <= 5 && j >= 2 && j <= 4) { // Соседние клетки
+					continue
+				}
+				mockCells[i][j].EXPECT().GetShip().Return(nil).AnyTimes()
+			}
+		}
+
+		result := board.PlaceShipCoords(2, 3, 3, realization.Orientation(0))
+
+		if !result {
+			t.Error("Ожидалось успешное размещение корабля")
+		}
+		if len(board.Ships) != 1 {
+			t.Error("Корабль не был добавлен в массив кораблей")
+		}
+	})
+
+	t.Run("Успешное вертикальное размещение корабля", func(t *testing.T) {
+		ctrl.Finish()
+		// оставляем клетки для размещения корабля (3, 2) (3, 4)
+		for j := 0; j < 3; j++ {
+			mockCells[3][2+j].EXPECT().GetShip().Return(nil)
+		}
+
+		// настраиваем прямоугольник вокруг корабля
+		for i := 2; i <= 4; i++ {
+			for j := 1; j <= 5; j++ {
+				if !(i == 3 && j >= 2 && j <= 4) { // Исключаем основные клетки корабля
+					mockCells[i][j].EXPECT().GetShip().Return(nil).AnyTimes()
+				}
+			}
+		}
+
+		// ожидаем установку корабля в нужном месте
+		for j := 0; j < 3; j++ {
+			mockCells[3][2+j].EXPECT().SetShip(gomock.Any())
+		}
+
+		// настраиваем все остальные клетки поля
+		for i := 0; i < 10; i++ {
+			for j := 0; j < 10; j++ {
+				if !(i == 3 && j >= 2 && j <= 4) || // основные клетки
+					(i >= 2 && i <= 4 && j >= 1 && j <= 5) { // соседние клетки
+					mockCells[i][j].EXPECT().GetShip().Return(nil).AnyTimes()
+				}
+			}
+		}
+
+		result := board.PlaceShipCoords(3, 2, 3, realization.Orientation(1))
+
+		if !result {
+			t.Error("Ожидалось успешное размещение корабля")
 		}
 	})
 }

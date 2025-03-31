@@ -84,8 +84,11 @@ func (b *BoardImpl) CanPlaced(x, y, size int, o Orientation) bool {
 	if o == vertical && y+size > boardSize {
 		return false
 	}
-	for i := -1; i <= size; i++ {
-		for j := -1; j <= size; j++ {
+	if x < 0 || y < 0 {
+		return false
+	}
+	for i := 0; i <= size; i++ {
+		for j := 0; j <= size; j++ {
 			curX := x
 			curY := y
 

@@ -10,10 +10,9 @@
 package mocks
 
 import (
-	reflect "reflect"
-	realization "seabattle/seabattle/realization"
-
 	gomock "github.com/golang/mock/gomock"
+	reflect "reflect"
+	"seabattle/review_seabattle/realization"
 )
 
 type orientation int

@@ -1,8 +1,8 @@
-package review_seabattle
+package main
 
 import (
 	"fmt"
-	"seabattle/review_seabattle/realization"
+	"seabattle/seabattle/realization"
 )
 
 type Player interface {

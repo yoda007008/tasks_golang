@@ -2,15 +2,14 @@ package main
 
 import (
 	"fmt"
-	"seabattle/review_seabattle"
 )
 
 func main() {
-	game := review_seabattle.NewGame(2)
+	game := NewGame(2)
 
 	shipSizes := []int{4, 3, 3, 2, 2, 2, 1, 1, 1, 1}
 
-	for _, player := range game.(*review_seabattle.GameImpl).players {
+	for _, player := range game.(*GameImpl).players {
 		p := player.(*PlayerImpl)
 
 		for _, size := range shipSizes {
@@ -32,7 +31,7 @@ func main() {
 	}
 
 	var winnerID int
-	for _, player := range game.(*review_seabattle.GameImpl).players {
+	for _, player := range game.(*GameImpl).players {
 		if player.StatusPlayer() {
 			winnerID = player.(*PlayerImpl).id
 			break

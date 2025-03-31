@@ -12,7 +12,7 @@ package mocks
 import (
 	gomock "github.com/golang/mock/gomock"
 	reflect "reflect"
-	"seabattle/review_seabattle/realization"
+	"seabattle/seabattle/realization"
 )
 
 type orientation int

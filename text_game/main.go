@@ -9,18 +9,18 @@ type Game struct {
 	rooms        map[string]Room
 	player       Player
 	doorState    bool
-	kitchenFirst bool // Флаг первого посещения кухни
+	kitchenFirst bool
 }
 
 type Room struct {
 	description string
-	tableItems  []string // предметы на столе
-	chairItems  []string // предметы на стуле
+	tableItems  []string
+	chairItems  []string
 	exits       []string
 }
 
 type Player struct {
-	state     string // текущее состояние игрока
+	state     string
 	inventory []string
 	backPack  bool // наличие рюкзака
 }
@@ -193,7 +193,7 @@ func wearItem(item string, game *Game) string {
 
 	loc := game.rooms[game.player.state]
 
-	// Проверяем рюкзак на стуле
+	// проверяем рюкзак на стуле
 	for i, locItem := range loc.chairItems {
 		if locItem == "рюкзак" {
 			loc.chairItems = append(loc.chairItems[:i], loc.chairItems[i+1:]...)
@@ -203,7 +203,7 @@ func wearItem(item string, game *Game) string {
 		}
 	}
 
-	// Проверяем рюкзак на столе
+	// проверяем рюкзак на столе
 	for i, locItem := range loc.tableItems {
 		if locItem == "рюкзак" {
 			loc.tableItems = append(loc.tableItems[:i], loc.tableItems[i+1:]...)

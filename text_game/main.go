@@ -18,7 +18,7 @@ type Room struct {
 }
 
 type Player struct {
-	state     string
+	state     string // текущее состояние игрока
 	inventory []string
 	backPack  bool // наличие рюкзака
 }
@@ -83,6 +83,39 @@ func goTo(destination string, game *Game) string { // перемещение и�
 		}
 	}
 	return "Нет пути в " + destination
+}
+
+func takeItem(item string, game *Game) { // данный метод удаляет предмет с локации и перемещает его в инвентарь к игроку
+	curLocation := game.player.state
+	loc := game.rooms[curLocation]
+
+	for i, locItem := range loc.items {
+		if locItem == item {
+			if !game.player.backPack && item == "рюкзак" {
+				return "некуда класть"
+			}
+			game.rooms[game.player.state].items = append(loc.items[:i], loc.items[i+1:]...)
+
+			game.player.inventory = append(game.player.inventory, item)
+
+			return "предмет добавлен в инвентарь" + item
+		}
+	}
+}
+
+func wearItem(item string, game *Game) string { // данный метод проверяет наличие рюкзака и ищет его в текущей локации
+	if item != "рюкзак" {
+		return "можно надеть только рюкзак"
+	}
+
+	for i, lockItem := range game.rooms[game.player.state].items {
+		if lockItem == "рюкзак" {
+			game.rooms[game.player.state].items = append(game.rooms[game.player.state].items[:i], game.rooms[game.player.state].items[i+1:]...)
+			game.player.backPack = true
+			return "вы надели рюкзак"
+		}
+	}
+	return "нет такого предмета"
 }
 
 func handleCommand(command string, game *Game) {

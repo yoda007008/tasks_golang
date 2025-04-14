@@ -32,7 +32,7 @@ func main() {
 	res = res[:len(res)-1]
 
 	fmt.Println(res)
-	fmt.Println("Duration:", time.Since(start))
+	fmt.Println("Время:", time.Since(start))
 }
 
 func ExecutePipeline(data int, wg *sync.WaitGroup, ch chan string) {

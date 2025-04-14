@@ -20,23 +20,32 @@ func main() {
 	//}
 }
 
-func SingleHash(data int) string {
+func ExecutePipeline(data int, wg *sync.WaitGroup, ch chan string) {
+	defer wg.Done()
 	strData := strconv.Itoa(data)
 
 	crcDate := CountDataSingerCrc32(strData)
 	mdDate := CountDataSignerMd5(strData)
 
-	res := crcDate + "~" + mdDate
-	return res
+	combo := crcDate + "~" + mdDate // SingleHash()
+
+	var innerWg sync.WaitGroup
+	res := make([]string, 6)
+	for i := 0; i < 6; i++ {
+		innerWg.Add(1)
+		go func(i int) {
+			defer innerWg.Done()
+			crc := CountDataSingerCrc32(strconv.Itoa(i) + combo)
+			res[i] = crc
+		}(i)
+	}
+	innerWg.Wait() // MultiHash()
+
 }
 
-func ExecutePipeline(data int, wg *sync.WaitGroup, ch chan string) {
-	defer wg.Done()
-}
-
-func CountDataSignerMd5(data string) string {
+func CountDataSignerMd5(data string) string { // функция хэширует
 	crcH := crc32.ChecksumIEEE([]byte(data))
-	dateHash := strconv.FormatInt(uint64(crcH), 10)
+	dateHash := strconv.FormatInt(int64(crcH), 10)
 	time.Sleep(time.Second)
 	return dateHash
 }

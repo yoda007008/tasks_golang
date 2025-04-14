@@ -11,14 +11,28 @@ import (
 )
 
 func main() {
-	//start := time.Now()
-	//
-	//data := []int{0, 1, 2, 3, 4, 52}
-	//ch := make(chan int, len(data))
-	//
-	//for _, v := range data {
-	//
-	//}
+	start := time.Now()
+
+	var wg sync.WaitGroup
+	data := []int{0, 1, 2, 3, 4, 52}
+	ch := make(chan string, len(data))
+
+	for _, v := range data {
+		wg.Add(1)
+		go ExecutePipeline(v, &wg, ch)
+	}
+	wg.Wait()
+	close(ch)
+
+	res := ""
+	for result := range ch {
+		res += result
+	}
+
+	res = res[:len(res)-1]
+
+	fmt.Println(res)
+	fmt.Println("Duration:", time.Since(start))
 }
 
 func ExecutePipeline(data int, wg *sync.WaitGroup, ch chan string) {
@@ -44,7 +58,7 @@ func ExecutePipeline(data int, wg *sync.WaitGroup, ch chan string) {
 	innerWg.Wait() // MultiHash()
 
 	comboRes := strings.Join(res, "")
-	ch <- comboRes // CombineResults()
+	ch <- comboRes + "_" // CombineResults()
 }
 
 func CountDataSignerMd5(data string) string { // функция хэширует md5

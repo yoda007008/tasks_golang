@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"sync"
 	"sync/atomic"
 	"testing"
 	"time"
@@ -17,6 +18,8 @@ import (
 	возможно кому-то будет легче с ним
 	при правильной реализации ваш код конечно же должен его проходить
 */
+
+var wg sync.WaitGroup
 
 func TestByIlia(t *testing.T) {
 
@@ -43,7 +46,7 @@ func TestByIlia(t *testing.T) {
 
 	start := time.Now()
 
-	ExecutePipeline(freeFlowJobs...)
+	ExecutePipeline(0, *wg)
 
 	end := time.Since(start)
 
